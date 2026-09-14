@@ -92,7 +92,7 @@ export async function createProductAction(
   if (!(coverFile instanceof File) || coverFile.size === 0) {
     return { error: "Kapak görseli zorunludur." };
   }
-  if (getProductBySlug(slug)) {
+  if (await getProductBySlug(slug)) {
     return { error: "Bu URL (slug) zaten kullanılıyor. Başka bir tane deneyin." };
   }
 
@@ -110,7 +110,7 @@ export async function createProductAction(
     return { error: e instanceof Error ? e.message : "Galeri görseli yüklenemedi." };
   }
 
-  createProduct({
+  await createProduct({
     slug,
     name,
     category,
@@ -138,7 +138,7 @@ export async function updateProductAction(
 ): Promise<FormState> {
   await requireAdmin();
 
-  const existing = getProductBySlug(originalSlug);
+  const existing = await getProductBySlug(originalSlug);
   if (!existing) return { error: "Ürün bulunamadı." };
 
   const name = String(formData.get("name") || "").trim();
@@ -153,7 +153,7 @@ export async function updateProductAction(
   if (!slug) return { error: "Geçerli bir URL (slug) girin." };
   if (!category) return { error: "Kategori seçin." };
   if (!collection) return { error: "Koleksiyon seçin." };
-  if (slug !== originalSlug && getProductBySlug(slug)) {
+  if (slug !== originalSlug && (await getProductBySlug(slug))) {
     return { error: "Bu URL (slug) zaten kullanılıyor. Başka bir tane deneyin." };
   }
 
@@ -173,7 +173,7 @@ export async function updateProductAction(
     return { error: e instanceof Error ? e.message : "Galeri görseli yüklenemedi." };
   }
 
-  updateProduct(originalSlug, {
+  await updateProduct(originalSlug, {
     slug,
     name,
     category,
@@ -198,7 +198,7 @@ export async function updateProductAction(
 
 export async function deleteProductAction(slug: string) {
   await requireAdmin();
-  deleteProduct(slug);
+  await deleteProduct(slug);
   revalidatePath("/");
   revalidatePath("/urunler");
   revalidatePath("/admin");

@@ -11,7 +11,7 @@ export default async function EditProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
   const action = updateProductAction.bind(null, slug);
   return (

@@ -7,8 +7,8 @@ import { DeleteProductButton } from "@/components/delete-product-button";
 import { deleteProductAction } from "@/app/admin/actions";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
-export default function AdminDashboard() {
-  const products = getProducts();
+export default async function AdminDashboard() {
+  const products = await getProducts();
   return (
     <>
       <AdminNav />

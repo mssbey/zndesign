@@ -1,8 +1,6 @@
-import { writeFile, mkdir } from "node:fs/promises";
+import { put } from "@vercel/blob";
 import { randomUUID } from "node:crypto";
-import path from "node:path";
 
-const uploadsDir = path.join(process.cwd(), "public", "uploads");
 const extensionByType: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -21,9 +19,10 @@ export async function saveUploadedImage(file: File): Promise<string> {
   if (file.size > maxBytes) {
     throw new Error("Görsel 8MB'tan büyük olamaz.");
   }
-  await mkdir(uploadsDir, { recursive: true });
   const filename = `${randomUUID()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadsDir, filename), buffer);
-  return `/uploads/${filename}`;
+  const blob = await put(`uploads/${filename}`, file, {
+    access: "public",
+    addRandomSuffix: false,
+  });
+  return blob.url;
 }

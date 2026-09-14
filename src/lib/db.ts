@@ -1,6 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import path from "node:path";
+import { neon } from "@neondatabase/serverless";
 
 export type Product = {
   slug: string;
@@ -28,47 +26,45 @@ type ProductRow = {
   sizes: string;
   colors: string;
   fabrics: string;
-  is_new: number;
-  campaign: number;
+  is_new: boolean;
+  campaign: boolean;
   added: string;
   description: string;
 };
 
-const dataDir = path.join(process.cwd(), "data");
-mkdirSync(dataDir, { recursive: true });
+const sql = neon(process.env.DATABASE_URL!);
 
-const globalForDb = globalThis as unknown as { __znDb?: DatabaseSync };
+let initPromise: Promise<void> | null = null;
 
-const db =
-  globalForDb.__znDb ??
-  new DatabaseSync(path.join(dataDir, "app.db"), { timeout: 5000 });
-globalForDb.__znDb = db;
+function ensureInit(): Promise<void> {
+  if (!initPromise) {
+    initPromise = (async () => {
+      await sql.query(`
+        CREATE TABLE IF NOT EXISTS products (
+          slug TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          category TEXT NOT NULL,
+          collection TEXT NOT NULL,
+          image TEXT NOT NULL,
+          gallery TEXT NOT NULL,
+          sizes TEXT NOT NULL,
+          colors TEXT NOT NULL,
+          fabrics TEXT NOT NULL,
+          is_new BOOLEAN NOT NULL DEFAULT false,
+          campaign BOOLEAN NOT NULL DEFAULT false,
+          added TEXT NOT NULL,
+          description TEXT NOT NULL DEFAULT ''
+        );
+      `);
+      await seedIfEmpty();
+    })();
+  }
+  return initPromise;
+}
 
-db.exec("PRAGMA journal_mode = WAL;");
-db.exec("PRAGMA busy_timeout = 5000;");
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS products (
-    slug TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    category TEXT NOT NULL,
-    collection TEXT NOT NULL,
-    image TEXT NOT NULL,
-    gallery TEXT NOT NULL,
-    sizes TEXT NOT NULL,
-    colors TEXT NOT NULL,
-    fabrics TEXT NOT NULL,
-    is_new INTEGER NOT NULL DEFAULT 0,
-    campaign INTEGER NOT NULL DEFAULT 0,
-    added TEXT NOT NULL,
-    description TEXT NOT NULL DEFAULT ''
-  );
-`);
-
-function seedIfEmpty() {
-  const { count } = db
-    .prepare("SELECT COUNT(*) as count FROM products")
-    .get() as { count: number };
+async function seedIfEmpty() {
+  const rows = await sql.query("SELECT COUNT(*)::int as count FROM products");
+  const count = (rows[0] as { count: number }).count;
   if (count > 0) return;
 
   const names = [
@@ -115,14 +111,8 @@ function seedIfEmpty() {
     "Küçük dünyalar için sakin renkler ve sıcak detaylar.",
   ];
 
-  const insert = db.prepare(`
-    INSERT INTO products
-      (slug, name, category, collection, image, gallery, sizes, colors, fabrics, is_new, campaign, added, description)
-    VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  names.forEach((name, i) => {
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
     const g = groups[i];
     const image =
       g === 0
@@ -138,24 +128,30 @@ function seedIfEmpty() {
     const fabrics =
       g === 3 ? ["Dokuma"] : i % 2 ? ["Keten dokulu", "Kadife"] : ["Keten dokulu", "Bukle"];
     const slug = name.toLowerCase().replaceAll(" ", "-");
-    insert.run(
-      slug,
-      name,
-      categorySlugs[g],
-      g === 5 ? "kids-dunyasi" : i % 2 ? "modern-konfor" : "sade-yasam",
-      image,
-      JSON.stringify(gallery),
-      JSON.stringify(sizes),
-      JSON.stringify(colors),
-      JSON.stringify(fabrics),
-      i < 4 || i === 12 ? 1 : 0,
-      0,
-      `2026-08-${String(28 - i).padStart(2, "0")}`,
-      `${name}: ${categoryDescriptions[g]} Renk, kumaş ve ölçü alternatiflerini birlikte değerlendirelim.`,
+
+    await sql.query(
+      `INSERT INTO products
+        (slug, name, category, collection, image, gallery, sizes, colors, fabrics, is_new, campaign, added, description)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       ON CONFLICT (slug) DO NOTHING`,
+      [
+        slug,
+        name,
+        categorySlugs[g],
+        g === 5 ? "kids-dunyasi" : i % 2 ? "modern-konfor" : "sade-yasam",
+        image,
+        JSON.stringify(gallery),
+        JSON.stringify(sizes),
+        JSON.stringify(colors),
+        JSON.stringify(fabrics),
+        i < 4 || i === 12,
+        false,
+        `2026-08-${String(28 - i).padStart(2, "0")}`,
+        `${name}: ${categoryDescriptions[g]} Renk, kumaş ve ölçü alternatiflerini birlikte değerlendirelim.`,
+      ],
     );
-  });
+  }
 }
-seedIfEmpty();
 
 function fromRow(row: ProductRow): Product {
   return {
@@ -168,74 +164,82 @@ function fromRow(row: ProductRow): Product {
     sizes: JSON.parse(row.sizes),
     colors: JSON.parse(row.colors),
     fabrics: JSON.parse(row.fabrics),
-    isNew: !!row.is_new,
-    campaign: !!row.campaign,
+    isNew: row.is_new,
+    campaign: row.campaign,
     added: row.added,
     description: row.description,
   };
 }
 
-export function getProducts(): Product[] {
-  const rows = db
-    .prepare("SELECT * FROM products ORDER BY added DESC")
-    .all() as unknown as ProductRow[];
+export async function getProducts(): Promise<Product[]> {
+  await ensureInit();
+  const rows = (await sql.query(
+    "SELECT * FROM products ORDER BY added DESC",
+  )) as unknown as ProductRow[];
   return rows.map(fromRow);
 }
 
-export function getProductBySlug(slug: string): Product | null {
-  const row = db
-    .prepare("SELECT * FROM products WHERE slug = ?")
-    .get(slug) as unknown as ProductRow | undefined;
-  return row ? fromRow(row) : null;
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  await ensureInit();
+  const rows = (await sql.query(
+    "SELECT * FROM products WHERE slug = $1",
+    [slug],
+  )) as unknown as ProductRow[];
+  return rows[0] ? fromRow(rows[0]) : null;
 }
 
 export type ProductInput = Omit<Product, "added"> & { added?: string };
 
-export function createProduct(input: ProductInput) {
-  db.prepare(
+export async function createProduct(input: ProductInput) {
+  await ensureInit();
+  await sql.query(
     `INSERT INTO products
       (slug, name, category, collection, image, gallery, sizes, colors, fabrics, is_new, campaign, added, description)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    input.slug,
-    input.name,
-    input.category,
-    input.collection,
-    input.image,
-    JSON.stringify(input.gallery),
-    JSON.stringify(input.sizes),
-    JSON.stringify(input.colors),
-    JSON.stringify(input.fabrics),
-    input.isNew ? 1 : 0,
-    input.campaign ? 1 : 0,
-    input.added || new Date().toISOString().slice(0, 10),
-    input.description,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+    [
+      input.slug,
+      input.name,
+      input.category,
+      input.collection,
+      input.image,
+      JSON.stringify(input.gallery),
+      JSON.stringify(input.sizes),
+      JSON.stringify(input.colors),
+      JSON.stringify(input.fabrics),
+      input.isNew,
+      input.campaign,
+      input.added || new Date().toISOString().slice(0, 10),
+      input.description,
+    ],
   );
 }
 
-export function updateProduct(originalSlug: string, input: ProductInput) {
-  db.prepare(
+export async function updateProduct(originalSlug: string, input: ProductInput) {
+  await ensureInit();
+  await sql.query(
     `UPDATE products SET
-      slug = ?, name = ?, category = ?, collection = ?, image = ?, gallery = ?,
-      sizes = ?, colors = ?, fabrics = ?, is_new = ?, campaign = ?, description = ?
-     WHERE slug = ?`,
-  ).run(
-    input.slug,
-    input.name,
-    input.category,
-    input.collection,
-    input.image,
-    JSON.stringify(input.gallery),
-    JSON.stringify(input.sizes),
-    JSON.stringify(input.colors),
-    JSON.stringify(input.fabrics),
-    input.isNew ? 1 : 0,
-    input.campaign ? 1 : 0,
-    input.description,
-    originalSlug,
+      slug = $1, name = $2, category = $3, collection = $4, image = $5, gallery = $6,
+      sizes = $7, colors = $8, fabrics = $9, is_new = $10, campaign = $11, description = $12
+     WHERE slug = $13`,
+    [
+      input.slug,
+      input.name,
+      input.category,
+      input.collection,
+      input.image,
+      JSON.stringify(input.gallery),
+      JSON.stringify(input.sizes),
+      JSON.stringify(input.colors),
+      JSON.stringify(input.fabrics),
+      input.isNew,
+      input.campaign,
+      input.description,
+      originalSlug,
+    ],
   );
 }
 
-export function deleteProduct(slug: string) {
-  db.prepare("DELETE FROM products WHERE slug = ?").run(slug);
+export async function deleteProduct(slug: string) {
+  await ensureInit();
+  await sql.query("DELETE FROM products WHERE slug = $1", [slug]);
 }

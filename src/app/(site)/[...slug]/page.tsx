@@ -47,7 +47,7 @@ export async function generateMetadata({
   params: Promise<{ slug?: string[] }>;
 }): Promise<Metadata> {
   const { slug = [] } = await params;
-  const p = slug[0] === "urunler" && slug[1] ? getProductBySlug(slug[1]) : null;
+  const p = slug[0] === "urunler" && slug[1] ? await getProductBySlug(slug[1]) : null;
   const c =
     slug[0] === "koleksiyonlar"
       ? collections.find((c) => c.slug === slug[1])
@@ -77,12 +77,13 @@ export default async function Page({
       <Suspense
         fallback={<div className="wrap section">Ürünler yükleniyor…</div>}
       >
-        <Catalog products={getProducts()} />
+        <Catalog products={await getProducts()} />
       </Suspense>
     );
   if (page === "urunler" && id) {
-    const p = getProductBySlug(id);
+    const p = await getProductBySlug(id);
     if (!p) notFound();
+    const allProducts = await getProducts();
     return (
       <>
         <ProductDetail product={p} />
@@ -92,7 +93,7 @@ export default async function Page({
             title="Birbirini tamamlayan seçenekler."
           />
           <ProductGrid
-            items={getProducts()
+            items={allProducts
               .filter(
                 (x) =>
                   x.slug !== id &&
@@ -156,7 +157,7 @@ export default async function Page({
         <section className="wrap section">
           <SectionHead eyebrow="KOLEKSİYONUN PARÇALARI" title={c.subtitle} />
           <ProductGrid
-            items={getProducts().filter((p) => p.collection === id)}
+            items={(await getProducts()).filter((p) => p.collection === id)}
           />
         </section>
       </>

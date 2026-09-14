@@ -14,8 +14,8 @@ export const metadata = {
     ? { alternates: { canonical: site.domain.replace(/\/$/, "") } }
     : {}),
 };
-export default function Home() {
-  const products = getProducts();
+export default async function Home() {
+  const products = await getProducts();
   const newest = products.filter((p) => p.isNew).slice(0, 4);
   return (
     <>
