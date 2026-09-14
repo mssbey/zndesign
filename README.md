@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# ZN Design | Uyku & Yaşam
 
-## Getting Started
+Next.js App Router, TypeScript ve Tailwind CSS ile hazırlanmış dijital ürün kataloğu.
 
-First, run the development server:
+## Çalıştırma
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sh
+npm install
+npm run dev -- --port 3001
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Üretim: `npm run build` ardından `npm run start -- --port 3001`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## İçerik ve iletişim
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/lib/data.ts`: 16 demo ürün, 6 kategori, 3 demo koleksiyon ve merkezi marka verisi.
+- `.env.example` dosyasını `.env.local` olarak kopyalayın. `NEXT_PUBLIC_WHATSAPP_NUMBER` uluslararası formatta, ülke koduyla yazılır. `NEXT_PUBLIC_PHONE` isteğe bağlıdır.
+- `NEXT_PUBLIC_SITE_URL`: gerçek HTTPS domain. Boşken sahte canonical veya sitemap adresi üretilmez.
+- `NEXT_PUBLIC_LOGO_PATH`: `public` altına eklenecek orijinal, kırpılmış SVG/şeffaf PNG logosunun `/logo.svg` gibi yolu. Logo PDF'i bu oturumda sağlanmadığı için mevcut geometrik logo taklit edilmedi; geçici düz marka metni kullanıldı. PDF sağlandığında içindeki logo, Bedding yazısı korunarak çıkarılmalıdır.
+- NEXT_PUBLIC değişkenleri değişince yeniden build alınır.
+- Fiyatlar, telefon, çalışma saatleri ve sosyal medya bilgileri uydurulmamıştır. Kampanya ürünleri veride `campaign: true` ile yönetilir; başlangıçta aktif kampanya yoktur.
+- WhatsApp numarası yokken ürün mesajı ve özel üretim talebi iletişim sayfasına taşınır. İletişim formu mesaj hazırlar/kopyalar; sunucuya kayıt veya gönderim yapmaz.
+- Görseller yapay zekâyla oluşturulmuş temsili görsellerdir. Gerçek ürün fotoğrafları ve seçenekleriyle değiştirilmelidir. Demo ürünler bazı görselleri paylaşır.
 
-## Learn More
+## Kontroller
 
-To learn more about Next.js, take a look at the following resources:
+```sh
+npm run lint
+npm run build
+node tests/contact.mjs
+npx playwright install chromium
+# Üretim sunucusu localhost:3001 üzerinde çalışırken:
+node tests/browser.mjs
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tarayıcı kontrolleri: 1440px masaüstü / 390px mobil ana sayfa, katalog ve detay ekranları; taşma, mobil menü, arama/kategori filtreleri, URL koruma, temizleme, kampanya boş durumu, galeri, ürün ve özel üretim mesajları, sayfa rotaları ve 404.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ekran görüntüleri ve test özeti `artifacts/` altında. Tarayıcı eklentisinde bağlı tarayıcı bulunmadığından yerel Playwright Chromium kullanıldı.
 
-## Deploy on Vercel
+Görsellerin üretim notları: `IMAGE-PROMPTS.md`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tüm testleri kendi geçici üretim sunucusuyla çalıştırmak için (3001 portu boşken): 
+ode tests/run.mjs. Ek kontroller 320/768/1024 px taşma, bütün ürün/koleksiyon rotaları, görsel yükleme, tüm filtre boyutları ve alfabetik sıralamayı kapsar.

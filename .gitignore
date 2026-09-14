@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+!.env.example
+
+# dev/test artifacts (screenshots, logs, reports)
+/artifacts/
+.tmp-*
+
+# admin data
+/data/*.db
+/data/*.db-*
+/public/uploads/*
+!/public/uploads/.gitkeep
