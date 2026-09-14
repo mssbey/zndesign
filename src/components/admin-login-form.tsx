@@ -8,26 +8,20 @@ export function AdminLoginForm() {
     initialState,
   );
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-sm">
+    <form action={formAction} className="admin-login-form">
+      <label>
         Şifre
-        <input
-          type="password"
-          name="password"
-          required
-          autoFocus
-          className="rounded border border-[var(--line)] px-3 py-2"
-        />
+        <input type="password" name="password" required autoFocus />
       </label>
       {state.error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="admin-login-error" role="alert">
           {state.error}
         </p>
       )}
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-[var(--ink)] px-4 py-2 text-sm text-white disabled:opacity-60"
+        className="button admin-login-submit"
       >
         {pending ? "Giriş yapılıyor…" : "Giriş Yap"}
       </button>
