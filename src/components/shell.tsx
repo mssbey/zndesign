@@ -15,65 +15,23 @@ const links = [
 ];
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [compact, setCompact] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const path = usePathname();
   const toggle = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    const f = () => setCompact(window.scrollY > 40);
-    f();
-    window.addEventListener("scroll", f, { passive: true });
-    return () => window.removeEventListener("scroll", f);
-  }, []);
   return (
-    <header className={compact ? "header compact" : "header"}>
-      <div className="header-inner">
-        <Link
-          href="/"
-          aria-label="ZN Design ana sayfa"
-          onClick={() => setOpen(false)}
-        >
-          <Brand />
-        </Link>
-        <nav
-          id="navigation"
-          aria-label="Ana menü"
-          className={open ? "navigation open" : "navigation"}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setOpen(false);
-              toggle.current?.focus();
-            }
-          }}
-        >
-          {links.map(([url, label]) => (
-            <Link
-              key={url}
-              href={url}
-              aria-current={path === url ? "page" : undefined}
-              onClick={() => setOpen(false)}
-            >
-              {label}
-            </Link>
-          ))}
-          <Link
-            href="/magazamiz"
-            className="store-link"
-            onClick={() => setOpen(false)}
-          >
-            Mağazamız <Arrow diagonal />
-          </Link>
-        </nav>
-        <button
-          ref={toggle}
-          className="menu-toggle"
-          aria-label={open ? "Menüyü kapat" : "Menüyü aç"}
-          aria-expanded={open}
-          aria-controls="navigation"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? "✕" : "☰"}
-        </button>
+    <header className="wd-header">
+      <div className="wd-topbar"><div className="wrap"><span>TÜRKÇE <span aria-hidden="true">⌄</span> <b> TÜRKİYE</b></span><span>YAŞAM ALANINIZA TASARIM, UYKUNUZA KONFOR</span><div><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim">İLETİŞİM</Link><Link href="/hakkimizda">HAKKIMIZDA</Link></div></div></div>
+      <div className="wrap wd-main-header">
+        <button ref={toggle} className="menu-toggle" aria-label={open ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={open} aria-controls="navigation" onClick={() => setOpen(!open)}>{open ? "✕" : "☰"}</button>
+        <Link href="/" aria-label="ZN Design ana sayfa"><Brand /></Link>
+        <form action="/urunler" className="wd-search" role="search"><input name="q" type="search" aria-label="Ürünlerde ara" placeholder="Ürünlerde ara..."/><select name="kategori" aria-label="Arama kategorisi"><option value="">TÜM KATEGORİLER</option>{categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</select><button aria-label="Ara" type="submit"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg></button></form>
+        <div className="wd-header-actions"><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim" aria-label="Bilgi ve fiyat alın"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 11a8 8 0 0 1-8 8H4l-2 3V11a9 9 0 0 1 18 0Z"/><path d="M7 10h8M7 14h5"/></svg><span>Bilgi & Fiyat</span></Link></div>
       </div>
+      <div className="wd-nav-border"><div className="wrap wd-nav-row">
+        <div className="wd-category-menu"><button onClick={() => setCategoryOpen(!categoryOpen)} aria-expanded={categoryOpen} aria-controls="header-categories"><span>☰</span> TÜM KATEGORİLER <span>⌄</span></button>{categoryOpen && <div id="header-categories" onKeyDown={e => {if(e.key === "Escape") setCategoryOpen(false);}}>{categories.map(c => <Link key={c.slug} href={`/urunler?kategori=${c.slug}`} onClick={() => setCategoryOpen(false)}>{c.name}<span>›</span></Link>)}</div>}</div>
+        <nav id="navigation" aria-label="Ana menü" className={open ? "wd-navigation open" : "wd-navigation"} onKeyDown={e => {if(e.key === "Escape") {setOpen(false);toggle.current?.focus();}}}>{links.map(([url,label]) => <Link key={url} href={url} aria-current={path === url ? "page" : undefined} onClick={() => setOpen(false)}>{label}</Link>)}</nav>
+        <Link className="wd-offers" href="/urunler?kampanya=1">ÖZEL FIRSATLAR</Link>
+      </div></div>
     </header>
   );
 }

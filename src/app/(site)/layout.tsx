@@ -1,3 +1,4 @@
+import "./woodmart.css";
 import {
   Header,
   Footer,
@@ -10,7 +11,7 @@ export default function SiteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="woodmart-site">
       <a href="#main" className="skip-link">
         İçeriğe geç
       </a>
@@ -19,6 +20,6 @@ export default function SiteLayout({
       <Footer />
       <FloatingContact />
       <ScrollReveal />
-    </>
+    </div>
   );
 }
