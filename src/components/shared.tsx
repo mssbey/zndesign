@@ -33,9 +33,9 @@ export function Brand() {
       {site.logo ? (
         <Image
           src={site.logo}
-          width={124}
-          height={72}
-          alt="ZN Design Bedding"
+          width={102}
+          height={150}
+          alt="Zenn Bedding"
           className="original-logo"
         />
       ) : (

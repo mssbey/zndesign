@@ -5,7 +5,7 @@ export const site = {
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
   phone: process.env.NEXT_PUBLIC_PHONE || "",
   domain: process.env.NEXT_PUBLIC_SITE_URL || "",
-  logo: process.env.NEXT_PUBLIC_LOGO_PATH || "",
+  logo: process.env.NEXT_PUBLIC_LOGO_PATH || "/images/logo.png",
 };
 export const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
 export const categories = [
