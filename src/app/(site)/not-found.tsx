@@ -6,7 +6,7 @@ export default function NotFound() {
       <h1>Yeni bir yoldan keşfedelim.</h1>
       <p>Aradığınız sayfa veya ürün bulunamadı.</p>
       <Link className="button" href="/urunler">
-        Ürünleri Keşfet ⟶
+        Ürünleri Keşfet &gt;
       </Link>
     </div>
   );

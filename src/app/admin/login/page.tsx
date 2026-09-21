@@ -14,7 +14,7 @@ export default function AdminLoginPage() {
         </p>
         <AdminLoginForm />
         <Link href="/" className="admin-login-back">
-          ← Siteye dön
+          &lt; Siteye dön
         </Link>
       </div>
     </div>

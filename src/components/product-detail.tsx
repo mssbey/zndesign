@@ -55,7 +55,7 @@ export function ProductDetail({ product: p }: { product: Product }) {
               alt={`${p.name}, temsili ürün görseli`}
               priority
             />
-            <span className="zoom-hint">Görseli büyüt ↗</span>
+            <span className="zoom-hint">Görseli büyüt &gt;</span>
           </button>
           <div className="thumbnails" aria-label="Ürün galerisi">
             {gallery.map((src, i) => (
@@ -182,7 +182,7 @@ export function ProductDetail({ product: p }: { product: Product }) {
             }
             aria-label="Önceki görsel"
           >
-            ←
+            &lt;
           </button>
           <span>
             {p.name} · {index + 1} / {gallery.length}
@@ -191,7 +191,7 @@ export function ProductDetail({ product: p }: { product: Product }) {
             onClick={() => setIndex((index + 1) % gallery.length)}
             aria-label="Sonraki görsel"
           >
-            →
+            &gt;
           </button>
           <button onClick={close} autoFocus>
             Kapat ✕

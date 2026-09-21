@@ -105,7 +105,7 @@ export function RequestForm({ custom = false }: { custom?: boolean }) {
           : site.whatsapp
             ? "WhatsApp ile Devam Et"
             : "Mesajı Hazırla"}{" "}
-        <span aria-hidden="true">⟶</span>
+        <span aria-hidden="true">&gt;</span>
       </button>
       {prepared && (
         <div aria-live="polite">

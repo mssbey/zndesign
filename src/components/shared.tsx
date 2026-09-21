@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Product, categoryName, colorHex, mapsUrl, site } from "@/lib/data";
-export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return <span aria-hidden="true">{diagonal ? "↗" : "⟶"}</span>;
+export function Arrow({}: { diagonal?: boolean }) {
+  return <span aria-hidden="true">&gt;</span>;
 }
 export function Photo({
   src,
