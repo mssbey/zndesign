@@ -31,6 +31,9 @@ function ProductCarousel({ products }: { products: Product[] }) {
   const rail = useRef<HTMLDivElement>(null);
   const interaction = useRef({ down: false, x: 0, left: 0, moved: false, until: 0 });
   const [paused, setPaused] = useState(false);
+  // Keep a full viewport of cards on both sides of the loop, even in small tabs.
+  const repetitions = Math.max(1, Math.ceil(8 / products.length));
+  const cards = Array.from({ length: repetitions }, () => products).flat();
   useEffect(() => {
     const el = rail.current;
     if (!el || paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -38,10 +41,13 @@ function ProductCarousel({ products }: { products: Product[] }) {
     const tick = (now: number) => {
       const elapsed = previous ? Math.min(now - previous, 50) : 0;
       previous = now;
+      // Native touch scrolling and keyboard scrolling can change the position
+      // between animation frames. Resume from that position, preserving fractions.
+      if (Math.abs(el.scrollLeft - position) > 1) position = el.scrollLeft;
       if (!interaction.current.down && now > interaction.current.until && !document.hidden) {
         position += elapsed * 0.025;
-        const width = el.scrollWidth / 2;
-        if (width <= el.clientWidth) { position = 0; }
+        const width = el.firstElementChild?.getBoundingClientRect().width ?? 0;
+        if (!width) return;
         if (position >= width) position -= width;
         el.scrollLeft = position;
       } else position = el.scrollLeft;
@@ -55,15 +61,17 @@ function ProductCarousel({ products }: { products: Product[] }) {
     <div ref={rail} className="wd-product-carousel" tabIndex={0} role="region" aria-label="Öne çıkan ürünler; kaydırarak keşfedin"
       onFocus={() => { interaction.current.until = Infinity; }}
       onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) interaction.current.until = performance.now() + 2000; }}
-      onPointerDown={e => { interaction.current = { down: true, x: e.clientX, left: e.currentTarget.scrollLeft, moved: false, until: Infinity }; }}
-      onPointerMove={e => { const state = interaction.current; if (!state.down) return; if (Math.abs(e.clientX - state.x) > 8) { state.moved = true; if (e.pointerType === "mouse") { e.currentTarget.setPointerCapture(e.pointerId); e.currentTarget.scrollLeft = state.left + state.x - e.clientX; } } }}
+      onPointerDown={e => { if (!e.isPrimary || e.button !== 0) return; interaction.current = { down: true, x: e.clientX, left: e.currentTarget.scrollLeft, moved: false, until: Infinity }; }}
+      onPointerMove={e => { const state = interaction.current; if (!state.down) return; if (Math.abs(e.clientX - state.x) > 8) { state.moved = true; if (e.pointerType !== "touch") { e.currentTarget.setPointerCapture(e.pointerId); e.currentTarget.scrollLeft = state.left + state.x - e.clientX; } } }}
       onPointerUp={() => { interaction.current.down = false; interaction.current.until = performance.now() + 2500; }}
       onPointerCancel={() => { interaction.current.down = false; interaction.current.until = performance.now() + 2500; }}
+      onLostPointerCapture={() => { interaction.current.down = false; interaction.current.until = performance.now() + 2500; }}
+      onPointerLeave={e => { if (interaction.current.down && !e.currentTarget.hasPointerCapture(e.pointerId)) { interaction.current.down = false; interaction.current.until = performance.now() + 2500; } }}
       onTouchEnd={() => { interaction.current.until = performance.now() + 2500; }}
       onWheel={() => { interaction.current.until = performance.now() + 2500; }}
       onDragStart={e => e.preventDefault()}
       onClickCapture={e => { if (interaction.current.moved) { e.preventDefault(); e.stopPropagation(); } }}>
-      {[0, 1].map(copy => <div className="wd-product-group" key={copy}>{products.map(p => <ProductCard product={p} key={p.slug}/>)}</div>)}
+      {[0, 1].map(copy => <div className="wd-product-group" key={copy}>{cards.map((p, i) => <ProductCard product={p} key={`${p.slug}-${i}`}/>)}</div>)}
     </div>
   </div>;
 }
