@@ -1,0 +1,84 @@
+/* Additions to the original storefront: vertical menus, fabrics and reference uploads. */
+.wd-nav-row{gap:18px}.wd-category-menu{flex-basis:220px}.wd-navigation{gap:16px}.wd-navigation>a,.zenn-nav-group>button{font-size:11px}
+.zenn-nav-group{position:relative}
+.zenn-nav-group>button{display:flex;align-items:center;gap:6px;min-height:50px;padding:0;background:none;border:0;text-transform:uppercase;font-weight:700;white-space:nowrap}
+.nav-chevron{display:inline-block;width:14px;height:14px;flex-shrink:0;vertical-align:middle;opacity:.8;transition:transform .2s ease}.wd-header button[aria-expanded=true]>.nav-chevron{transform:rotate(180deg)}.wd-category-menu>button>.nav-chevron{margin-left:auto}.wd-topbar .nav-chevron{width:11px;height:11px}
+.zenn-submenu{position:absolute;top:100%;left:-16px;width:245px;padding:6px 16px;background:#fff;border:1px solid #eee;box-shadow:0 8px 20px #00000012}
+.zenn-submenu[hidden]{display:none}
+.woodmart-site .zenn-submenu>a{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 3px;min-height:44px;font-size:13px;font-weight:400;text-transform:none;border-bottom:1px solid #eee;white-space:normal}
+.woodmart-site .zenn-submenu>a:hover{background:#f7f7f7}.woodmart-site .zenn-submenu>a:last-child{border:0;font-size:11px;color:#777}
+.wd-category-list.wd-category-list-vertical{display:flex;flex-direction:column;flex-wrap:nowrap;padding:0;max-width:720px;margin-inline:auto}
+.wd-category-list.wd-category-list-vertical>a{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border:0;border-bottom:1px solid #eee;font-size:14px;min-height:46px}
+.wd-category-list.wd-category-list-vertical>a:last-child{border-bottom:0}.wd-category-list-vertical>a>span{color:#999}
+.wd-collection-list{border-top:1px solid #e7e7e7}
+.wd-collection-row{display:flex;align-items:center;gap:24px;padding:20px 0;border-bottom:1px solid #e7e7e7}
+.wd-collection-row>.photo{width:125px;aspect-ratio:1.45;flex:none}.wd-collection-row>div:not(.photo){flex:1}
+.woodmart-site .wd-collection-row h3{font-size:18px}.wd-collection-row p{font-size:13px;margin-top:5px}.wd-collection-row>.wd-read-more{display:flex;align-items:center;gap:20px;font-size:11px}
+.wd-collection-row:hover{background:#fafafa}
+.wd-factory-invite{margin-top:55px}.wd-factory-invite>p:not(:first-child){max-width:800px;margin-inline:auto}.wd-contact-banner .actions{justify-content:center;flex-wrap:wrap;gap:16px;margin-top:22px}.wd-contact-banner .actions .button{margin-top:0}
+.factory-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-block:35px}.factory-gallery figure{margin:0}.factory-gallery .photo{aspect-ratio:1.3}.factory-gallery figcaption{font-size:11px;margin-top:8px}
+.zenn-vertical-list{display:flex;flex-direction:column;border-top:1px solid #e7e7e7}.zenn-vertical-list>a{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 8px;border-bottom:1px solid #e7e7e7}.zenn-vertical-list>a:hover{background:#fafafa}.zenn-vertical-list p{font-size:13px;margin-top:6px}.collection-directory{max-width:850px;margin-bottom:55px}
+.zenn-factory-details{display:grid;grid-template-columns:1fr 1fr;gap:60px;padding-block:30px 70px}.zenn-visit-steps{padding-left:20px;margin-top:30px}.zenn-visit-steps li{padding:0 0 20px 12px}.zenn-visit-steps p{font-size:13px;margin-top:5px}.zenn-factory-details .address-card .text-link{display:table;margin-top:15px}
+.woodmart-site .request-form{min-width:0}.woodmart-site .request-form .prepared-message{max-height:300px;overflow:auto}.woodmart-site .request-form .button:disabled{opacity:.6;cursor:wait}
+.request-fields{border:0;padding:0;margin:0;min-width:0}
+.woodmart-site .request-form label{font-size:11px;font-weight:600;margin-bottom:20px}
+.woodmart-site .request-form :is(input:not([type=checkbox]):not([type=file]),select,textarea){background:#fff;border-color:#d9dccf;font-size:13px;min-height:46px}
+.woodmart-site .request-form textarea{min-height:120px;resize:vertical}
+.woodmart-site .request-form .form-note{font-size:10px;line-height:1.9}
+.reference-field{margin-top:22px}
+.woodmart-site .reference-field>label{margin-bottom:8px}
+.woodmart-site .reference-field>p{font-size:11px;line-height:1.8;margin-bottom:16px}
+.woodmart-site label.reference-dropzone{position:relative;display:flex;align-items:center;flex-direction:column;text-align:center;border:1px dashed #aaa;background:#fafafa;padding:22px 16px;cursor:pointer;margin-bottom:20px}
+.reference-dropzone>span:first-child{font-size:28px;color:#555;line-height:1.2;margin-bottom:8px}
+.reference-dropzone>span:last-of-type{font-size:9px;font-weight:400;margin-top:6px;color:#777}
+.reference-dropzone input[type=file]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.reference-dropzone:focus-within{outline:2px solid #666;outline-offset:4px}
+.reference-previews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.reference-previews>div{position:relative;min-width:0;background:#fff;border:1px solid var(--line);padding:5px}
+.reference-previews img{display:block;width:100%;height:85px;object-fit:cover}
+.reference-previews>div>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;padding:5px 2px}
+.reference-previews button{position:absolute;right:0;top:0;display:grid;place-items:center;background:#262626;color:white;border:0;width:32px;height:32px;font-size:21px}
+.woodmart-site label.reference-consent{display:flex;gap:9px;align-items:flex-start;font-size:10px;font-weight:400;line-height:1.8}
+.reference-consent input{flex:0 0 16px;margin-top:3px}
+.woodmart-site .form-error{font-size:12px;color:#923c2f;background:#faebe4;border:1px solid #e3b5a8;padding:12px;margin:15px 0}
+.request-result{border-top:1px solid #ddd;margin-top:26px;padding-top:22px}
+.woodmart-site .request-result>p{font-size:12px}
+.woodmart-site .prepared-message{background:#fff;border:1px solid var(--line);font-size:11px;max-height:300px;overflow:auto}
+.request-result-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.fallback-share{margin-top:14px;display:block}
+.palette-disclaimer{padding:16px 22px;border-left:2px solid #aaa;background:#f7f7f7;font-size:11px;line-height:1.9}
+.fabric-jump{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 15px}
+.fabric-jump a{padding:9px 15px;border:1px solid var(--line);font-size:11px;display:flex;gap:18px;align-items:center;min-height:44px}
+.fabric-jump a:hover{background:#f7f7f7}
+.fabric-groups{padding-bottom:60px}
+.fabric-group{padding-block:42px;border-bottom:1px solid var(--line);scroll-margin-top:30px}
+.fabric-group-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:25px}
+.fabric-group-heading .eyebrow{margin-bottom:8px}
+.fabric-group-heading h2{margin-bottom:10px}
+.fabric-group-heading p:not(.eyebrow),.fabric-group-heading>span{font-size:11px;color:#777}
+.fabric-swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:20px}
+.fabric-swatch{border:0;background:transparent;padding:0;text-align:left;min-width:0}
+.fabric-texture{display:block;aspect-ratio:1.2;background-color:var(--swatch);position:relative;box-shadow:inset 0 0 25px #00000008;transition:transform .2s;isolation:isolate;background-size:cover}
+.fabric-texture:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,#ffffff25,transparent 50%,#00000015);z-index:-1}
+.fabric-texture.soft{background-image:repeating-linear-gradient(112deg,#ffffff0d 0 1px,#00000009 1px 2px,transparent 2px 4px)}
+.fabric-texture.woven{background-image:repeating-linear-gradient(0deg,#fff2 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,#0002 0 1px,transparent 1px 3px)}
+.fabric-texture.loop{background-image:radial-gradient(ellipse at 30% 40%,#ffffff45 0 1px,#00000015 2px,transparent 3px),radial-gradient(ellipse at 80% 85%,#00000018 0 1px,#ffffff25 2px,transparent 4px);background-size:7px 8px,9px 7px}
+.fabric-texture.plush{background-image:repeating-radial-gradient(ellipse at 20% 30%,#fff2 0 1px,transparent 1px 3px,#0001 3px 4px);background-size:8px 12px}
+.fabric-texture.fine{background-size:4px 4px,5px 6px}
+.fabric-texture.coarse{background-size:9px 10px,12px 10px}
+.fabric-swatch:hover .fabric-texture{transform:translateY(-3px)}
+.fabric-swatch.selected .fabric-texture{outline:2px solid #333;outline-offset:4px}
+.fabric-tick{display:none;position:absolute;right:8px;bottom:8px;background:#fff;color:#333;border-radius:50%;width:25px;height:25px;text-align:center;font-size:13px;line-height:25px}
+.selected .fabric-tick{display:block}
+.fabric-color-label{display:flex;justify-content:space-between;gap:8px;padding-top:12px;font-size:11px}
+.fabric-color-label>span{color:#777}
+.fabric-selection{position:sticky;bottom:0;z-index:20;background:#fffffff5;border-top:1px solid #ddd;backdrop-filter:blur(12px);padding:20px 0;box-shadow:0 -5px 20px #26262608}
+.fabric-selection>.wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-right:110px}
+.fabric-selection .eyebrow{font-size:8px;display:block;margin-bottom:4px}
+.fabric-selection p{font-size:17px;color:#333}
+.fabric-selection .actions{margin:0;gap:20px}
+@media(max-width:1100px){.wd-nav-row{gap:12px}.wd-category-menu{flex-basis:175px}.wd-navigation{gap:11px}.wd-navigation>a,.zenn-nav-group>button{font-size:10px}.wd-offers{font-size:9px}.wd-category-menu>button{font-size:11px;padding-inline:12px}.fabric-swatches{gap:14px}}
+@media(min-width:801px) and (max-width:950px){.wd-offers{display:none}.wd-category-menu{flex-basis:170px}}
+@media(max-width:800px){.wd-navigation.open{max-height:calc(100dvh - 120px);overflow-y:auto;overscroll-behavior:contain}.zenn-nav-group{width:100%}.zenn-nav-group>button{justify-content:space-between;width:100%;padding:13px;font-size:13px;border-bottom:1px solid #eee}.zenn-submenu{position:static;width:100%;padding:0 15px;background:#f7f7f7;border:0;box-shadow:none}.woodmart-site .zenn-submenu>a{font-size:13px;padding:12px 4px;min-height:46px}.wd-collection-row{gap:18px}.wd-collection-row>.photo{width:100px}.wd-collection-row>.wd-read-more{font-size:10px;gap:10px}.fabric-swatches{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 16px}.fabric-selection>.wrap{padding-right:70px}.fabric-selection .actions{flex-wrap:wrap;gap:10px}.zenn-factory-details{gap:30px}.factory-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.wd-collection-row{gap:14px;padding:16px 0}.wd-collection-row>.photo{width:75px;aspect-ratio:1}.woodmart-site .wd-collection-row h3{font-size:14px}.wd-collection-row p{font-size:11px}.wd-collection-row>.wd-read-more{font-size:0;gap:0}.wd-collection-row>.wd-read-more>span{font-size:16px}.wd-factory-invite{margin-top:35px}.wd-factory-invite h2{font-size:23px}.wd-factory-invite>p:not(:first-child){font-size:13px}.wd-contact-banner .actions{flex-direction:column;align-items:center}.woodmart-site .form-layout form{padding:25px 18px}.request-result-actions{flex-direction:column;align-items:flex-start}.reference-previews{gap:9px}.woodmart-site label.reference-dropzone{padding:18px 12px}.zenn-factory-details{grid-template-columns:1fr;gap:24px}.zenn-factory-details .address-card{padding:25px}.factory-gallery{grid-template-columns:1fr}.palette-disclaimer{font-size:11px;padding:14px 16px}.fabric-jump{gap:7px;margin-top:22px}.fabric-jump a{font-size:11px;padding:8px 11px;gap:12px}.fabric-group{padding-block:30px}.fabric-group-heading{align-items:flex-start;gap:12px}.fabric-group-heading>span{font-size:10px;white-space:nowrap}.fabric-group-heading p:not(.eyebrow){font-size:11px}.fabric-group-heading .eyebrow{font-size:9px;margin-bottom:8px}.fabric-swatches{gap:20px 12px}.fabric-color-label{font-size:11px;padding-top:9px}.fabric-texture{aspect-ratio:1}.fabric-selection{padding-block:14px}.fabric-selection>.wrap{padding-right:48px;flex-direction:column;align-items:flex-start;gap:10px}.fabric-selection .eyebrow{font-size:8px}.fabric-selection p{font-size:15px}.fabric-selection .actions{flex-direction:row;align-items:center;gap:8px}.fabric-selection .button{font-size:10px;padding:10px 12px}.fabric-selection .text-link{font-size:10px}.collection-directory h3{font-size:17px}.collection-directory p{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.fabric-texture,.nav-chevron{transition:none}}

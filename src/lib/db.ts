@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { categoryAliases, collectionAliases } from "./data";
 
 export type Product = {
   slug: string;
@@ -156,9 +157,9 @@ async function seedIfEmpty() {
 function fromRow(row: ProductRow): Product {
   return {
     slug: row.slug,
-    name: row.name,
-    category: row.category,
-    collection: row.collection,
+    name: row.name.replace(/zn\s+design/gi, "Zenn Bedding"),
+    category: categoryAliases[row.category] || row.category,
+    collection: collectionAliases[row.collection] || row.collection,
     image: row.image,
     gallery: JSON.parse(row.gallery),
     sizes: JSON.parse(row.sizes),
@@ -167,7 +168,7 @@ function fromRow(row: ProductRow): Product {
     isNew: row.is_new,
     campaign: row.campaign,
     added: row.added,
-    description: row.description,
+    description: row.description.replace(/zn\s+design/gi, "Zenn Bedding"),
   };
 }
 

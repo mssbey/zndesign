@@ -45,6 +45,8 @@ next-env.d.ts
 # dev/test artifacts (screenshots, logs, reports)
 /artifacts/
 .tmp-*
+local-dev.log
+local-dev-error.log
 
 # admin data
 /data/*.db

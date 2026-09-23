@@ -10,9 +10,9 @@ import "@fontsource/manrope/latin-600.css";
 import "./globals.css";
 import { site } from "@/lib/data";
 export const metadata: Metadata = {
-  title: { default: "ZN Design | Uyku & Yaşam", template: "%s | ZN Design" },
+  title: { default: "Zenn Bedding | Uyku & Yaşam", template: "%s | Zenn Bedding" },
   description:
-    "Konforun tasarımla buluştuğu yer. Baza, başlık, yatak ve uyku koleksiyonlarını keşfedin. Esenyurt, İstanbul.",
+    "Zenn Bedding: kendi tesisimizde ürettiğimiz baza, başlık ve yataklar. Özel ölçü, kumaş ve renk seçeneklerini keşfedin; üretimi yerinde görün, birlikte tasarlayalım.",
   ...(site.domain ? { metadataBase: new URL(site.domain) } : {}),
 };
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr">
+    <html lang="tr" data-scroll-behavior="smooth">
       <body>
         {children}
         <script

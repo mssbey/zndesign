@@ -1,12 +1,12 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { categories, categoryName, Product } from "@/lib/data";
+import { categories, categoryName, categoryAliases, Product } from "@/lib/data";
 import { ProductGrid } from "./shared";
 export function Catalog({ products }: { products: Product[] }) {
   const params = useSearchParams();
   const [open, setOpen] = useState(false);
-  const get = (k: string) => params.get(k) || "";
+  const get = (k: string) => k === "kategori" ? categoryAliases[params.get(k) || ""] || params.get(k) || "" : params.get(k) || "";
   function change(key: string, value: string) {
     const next = new URLSearchParams(window.location.search);
     if (value) next.set(key, value);
@@ -42,7 +42,7 @@ export function Catalog({ products }: { products: Product[] }) {
   return (
     <>
       <div className="page-intro wrap">
-        <p className="eyebrow">ZN DESIGN KOLEKSİYONU</p>
+        <p className="eyebrow">Zenn Bedding KOLEKSİYONU</p>
         <h1>
           {get("kategori")
             ? categoryName(get("kategori"))

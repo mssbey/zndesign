@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Product, categoryName, colorHex, mapsUrl, site } from "@/lib/data";
+import { Product, categoryName, colorHex, site } from "@/lib/data";
 export function Arrow({}: { diagonal?: boolean }) {
   return <span aria-hidden="true">&gt;</span>;
 }
@@ -22,32 +22,14 @@ export function Photo({
         alt={alt}
         fill
         sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 70vw"
-        priority={priority}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
       />
     </div>
   );
 }
 export function Brand() {
-  return (
-    <span className="brand">
-      {site.logo ? (
-        <Image
-          src={site.logo}
-          width={102}
-          height={150}
-          alt="Zenn Bedding"
-          className="original-logo"
-        />
-      ) : (
-        <>
-          <strong>
-            ZN <span>Design</span>
-          </strong>
-          <small>UYKU & YAŞAM</small>
-        </>
-      )}
-    </span>
-  );
+  return <span className="brand">{site.logo ? <Image src={site.logo} width={102} height={150} alt="Zenn Bedding" className="original-logo"/> : <><strong>Zenn Bedding</strong><small>UYKU & YAŞAM</small></>}</span>;
 }
 export function ProductCard({ product: p }: { product: Product }) {
   return (
@@ -117,12 +99,10 @@ export function StoreInvite() {
   return (
     <section className="store-invite wrap">
       <p className="eyebrow">İSTANBUL · ESENYURT</p>
-      <h2>Konforu yakından keşfedin.</h2>
-      <p>{site.address}</p>
+      <h2>Üretimi yerinde görün,<br/><em>birlikte tasarlayalım.</em></h2>
+      <p>Kumaşlara dokunun, ölçüleri konuşun. Size özel seçenekleri doğrudan üreticinizle değerlendirin.</p>
       <div className="actions">
-        <a className="button" href={mapsUrl} target="_blank" rel="noreferrer">
-          Yol Tarifi Al <Arrow diagonal />
-        </a>
+        <Link className="button" href="/fabrikamiz">Fabrikamızı Ziyaret Edin <Arrow /></Link>
         <Link className="text-link" href="/iletisim">
           Bizimle İletişime Geç <Arrow />
         </Link>

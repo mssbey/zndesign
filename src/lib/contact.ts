@@ -13,7 +13,7 @@ export function productMessage(
   url: string,
 ) {
   return [
-    `Merhaba, ZN Design sitesinde gördüğüm ${name} hakkında bilgi ve fiyat almak istiyorum.`,
+    `Merhaba, Zenn Bedding sitesinde gördüğüm ${name} hakkında bilgi ve fiyat almak istiyorum.`,
     size && `Ölçü: ${size}`,
     [color, fabric].filter(Boolean).length &&
       `Renk/Kumaş: ${[color, fabric].filter(Boolean).join(" / ")}`,

@@ -1,0 +1,133 @@
+import { chromium, expect } from "@playwright/test";
+import fs from "node:fs";
+const base = process.env.TEST_URL || "http://localhost:3001";
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
+const errors = [];
+page.on("pageerror", error => errors.push(error.message));
+fs.mkdirSync("artifacts", { recursive: true });
+const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/ZQAAAABJRU5ErkJggg==", "base64");
+const image = name => ({ name, mimeType: "image/png", buffer: png });
+async function visit(route) { const response = await page.goto(base + route, { waitUntil: "domcontentloaded" }); expect(response.status()).toBe(200); await page.locator("h1").waitFor(); }
+async function noOverflow(label) { expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), label).toBe(true); }
+async function screenshot(name) {
+  for (const image of await page.locator("img").all()) await image.scrollIntoViewIfNeeded();
+  await page.evaluate(async () => { await Promise.all([...document.images].map(img => img.decode().catch(() => {}))); await document.fonts.ready; window.scrollTo({ top: 0, behavior: "instant" }); });
+  await page.screenshot({ path: `artifacts/revision-${name}.png`, fullPage: true });
+}
+try {
+  await visit("/");
+  await expect(page.getByRole("search")).toBeVisible();
+  await expect(page.locator(".wd-sidebar")).toBeVisible();
+  for (const section of [".wd-slider", ".wd-product-tabs", ".wd-product-carousel", ".wd-spotlight", ".wd-about", ".wd-contact-banner", ".wd-collection-list", ".wd-references", ".wd-service-strip"]) await expect(page.locator(section).first()).toBeVisible();
+  expect(await page.locator(".woodmart-site").evaluate(el => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
+  expect(await page.locator("h1").evaluate(el => getComputedStyle(el).fontFamily)).toContain("Poppins");
+  await page.getByRole("button", { name: "Sonraki slayt" }).click();
+  await expect(page.locator(".wd-slide-image")).toHaveAttribute("href", "/koleksiyonlar/modern-koleksiyon");
+  await page.getByRole("button", { name: "Önceki slayt" }).click();
+  await expect(page.locator(".wd-slide-image")).toHaveAttribute("href", "/koleksiyonlar/bohem-koleksiyon");
+  await page.getByRole("button", { name: "Kampanyalar", exact: true }).click();
+  await expect(page.locator(".wd-product-tabs button[aria-pressed=true]")).toHaveText("Kampanyalar");
+  await page.getByRole("button", { name: "Öne çıkanlar", exact: true }).click();
+  await expect(page.locator(".wd-product-carousel")).toBeVisible();
+  const nav = page.getByRole("navigation", { name: "Ana menü" });
+  await nav.getByRole("button", { name: "Ürünler", exact: true }).click();
+  await expect(page.locator("#nav-products")).toBeVisible();
+  await expect(page.locator("#nav-products a")).toHaveText(["Baza↗", "Başlık↗", "Yatak↗", "Komodin↗", "Puf↗", "Sehpa↗", "Diğer Ürünler↗", "Tüm ürünler >"]);
+  const boxes = await page.locator("#nav-products a").evaluateAll(items => items.map(el => ({ x: el.getBoundingClientRect().x, y: el.getBoundingClientRect().y })));
+  expect(boxes.every((box, i) => !i || box.x === boxes[i - 1].x && box.y > boxes[i - 1].y)).toBe(true);
+  await screenshot("menu-desktop");
+  await nav.getByRole("button", { name: "Koleksiyonlar", exact: true }).click();
+  await expect(page.locator("#nav-products")).toBeHidden();
+  await expect(page.locator("#nav-collections a")).toHaveCount(7);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#nav-collections")).toBeHidden();
+  await expect(nav.getByRole("button", { name: "Koleksiyonlar", exact: true })).toBeFocused();
+  await screenshot("home-desktop");
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await noOverflow(`home ${width}px`);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Menüyü aç" }).click();
+  await nav.getByRole("button", { name: "Ürünler", exact: true }).click();
+  await screenshot("menu-mobile");
+  await page.locator("#nav-products").getByRole("link", { name: "Komodin" }).click();
+  await expect(page).toHaveURL(/kategori=komodin/);
+  await expect(page.getByRole("button", { name: "Menüyü aç" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Komodin");
+  await visit("/kumas-renk-kartelasi");
+  await expect(page.locator(".fabric-group")).toHaveCount(8);
+  await expect(page.locator(".fabric-swatch")).toHaveCount(48);
+  await page.getByRole("button", { name: "Luna — Adaçayı", exact: true }).click();
+  await expect(page.locator(".fabric-selection")).toContainText("Luna / Adaçayı");
+  await screenshot("fabrics-mobile");
+  await page.getByRole("link", { name: "Bu Seçimle Tasarlayalım" }).click();
+  await expect(page.getByLabel("Renk / kumaş tercihi")).toHaveValue("Luna / Adaçayı");
+  await page.getByLabel("İlgilenilen ürün kategorisi").selectOption({ label: "Baza" });
+  await page.getByLabel("İstenen ölçü").fill("160 × 200 cm");
+  await page.getByLabel("Ek açıklama").fill("Çizimime uygun bir başlık istiyorum.");
+  await page.locator("#reference-images").setInputFiles([image("sketch.png"), image("room.png")]);
+  await expect(page.locator(".reference-previews img")).toHaveCount(2);
+  await page.getByRole("button", { name: "room.png görselini kaldır" }).click();
+  await expect(page.locator(".reference-previews img")).toHaveCount(1);
+  await page.locator("#reference-images").setInputFiles([image("room.png")]);
+  await page.locator("input[name=consent]").check();
+  let uploads = 0;
+  await page.route("**/api/reference-images", async route => { uploads++; expect(route.request().postDataBuffer().toString()).toContain("sketch.png"); await route.fulfill({ status: 200, json: { requestId: "test-request", urls: ["https://example.test/sketch.png", "https://example.test/room.png"] } }); });
+  await page.getByRole("button", { name: "Talebi Hazırla", exact: true }).click();
+  await expect(page.locator(".prepared-message")).toContainText("test-request");
+  for (const text of ["Luna / Adaçayı", "160 × 200 cm", "https://example.test/sketch.png", "https://example.test/room.png"]) await expect(page.locator(".prepared-message")).toContainText(text);
+  const whatsapp = new URL(await page.getByRole("link", { name: "WhatsApp ile Devam Et" }).getAttribute("href"));
+  expect(whatsapp.hostname).toBe("wa.me");
+  expect(whatsapp.pathname).toBe("/905326791767");
+  expect(whatsapp.searchParams.get("text")).toContain("https://example.test/room.png");
+  expect(whatsapp.searchParams.get("text")).toContain("Luna / Adaçayı");
+  await screenshot("custom-mobile");
+  await page.getByLabel("İstenen ölçü").fill("180 × 200 cm");
+  await expect(page.locator(".prepared-message")).toHaveCount(0);
+  await page.getByRole("button", { name: "Talebi Hazırla", exact: true }).click();
+  expect(uploads).toBe(1); // Updating text reuses the existing uploaded files.
+  await page.unroute("**/api/reference-images");
+  await page.getByRole("button", { name: "room.png görselini kaldır" }).click();
+  await page.route("**/api/reference-images", route => route.fulfill({ status: 503, json: { error: "Test: yükleme kullanılamıyor." } }));
+  await page.getByRole("button", { name: "Talebi Hazırla", exact: true }).click();
+  await expect(page.locator(".form-error")).toContainText("Test: yükleme kullanılamıyor.");
+  await expect(page.locator(".reference-previews img")).toHaveCount(1);
+  await page.getByRole("button", { name: "Yüklemeden Hazırla ve Doğrudan Paylaş" }).click();
+  await expect(page.locator(".prepared-message")).toContainText("sketch.png");
+  await expect(page.locator(".prepared-message")).toContainText("180 × 200 cm");
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "canShare", { configurable: true, value: () => true });
+    Object.defineProperty(navigator, "share", { configurable: true, value: async data => { window.__sharedRequest = { text: data.text, files: data.files.map(file => file.name) }; } });
+  });
+  await page.getByRole("button", { name: "Görsellerle Paylaş" }).click();
+  const shared = await page.evaluate(() => window.__sharedRequest);
+  expect(shared.files).toEqual(["sketch.png"]);
+  expect(shared.text).toContain("180 × 200 cm");
+  await page.evaluate(() => Object.defineProperty(navigator, "canShare", { configurable: true, value: () => false }));
+  await page.getByRole("button", { name: "Görsellerle Paylaş" }).click();
+  await expect(page.locator(".request-result [role=status]")).toContainText("Bu cihaz görsel paylaşımını desteklemiyor");
+  await page.unroute("**/api/reference-images");
+  await page.locator("#reference-images").setInputFiles({ name: "bad.txt", mimeType: "text/plain", buffer: Buffer.from("not an image") });
+  await expect(page.locator(".form-error")).toContainText("JPG, PNG veya WEBP");
+  await expect(page.locator(".reference-previews img")).toHaveCount(1);
+  for (const route of ["/", "/urunler", "/koleksiyonlar", "/ozel-uretim", "/biz-kimiz", "/fabrikamiz", "/kumas-renk-kartelasi", "/iletisim", "/magazamiz", "/koleksiyonlar/modern-koleksiyon", "/koleksiyonlar/luxury-koleksiyon", "/koleksiyonlar/bohem-koleksiyon", "/koleksiyonlar/rustic-koleksiyon", "/koleksiyonlar/kids-collection", "/koleksiyonlar/yeni-koleksiyonlar"]) {
+    await visit(route);
+    expect(await page.locator("body").innerText()).not.toMatch(/ZN\s+Design|Hakkımızda/i);
+    expect(await page.title()).toContain("Zenn Bedding");
+    await page.setViewportSize({ width: 320, height: 844 }); await noOverflow(`${route} 320px`);
+    await page.setViewportSize({ width: 1440, height: 1000 }); await noOverflow(`${route} 1440px`);
+  }
+  await visit("/hakkimizda"); await expect(page).toHaveURL(base + "/biz-kimiz");
+  await visit("/koleksiyonlar/sade-yasam"); await expect(page).toHaveURL(base + "/koleksiyonlar/bohem-koleksiyon");
+  await visit("/koleksiyonlar/modern-konfor"); await expect(page).toHaveURL(base + "/koleksiyonlar/modern-koleksiyon");
+  await visit("/koleksiyonlar/kids-dunyasi"); await expect(page).toHaveURL(base + "/koleksiyonlar/kids-collection");
+  const sitemap = await (await page.request.get(base + "/sitemap.xml")).text();
+  for (const route of ["biz-kimiz", "kumas-renk-kartelasi", "fabrikamiz"]) expect(sitemap).toContain(`https://www.zenbedding.com.tr/${route}`);
+  await visit("/kumas-renk-kartelasi"); await screenshot("fabrics-desktop");
+  await visit("/ozel-uretim"); await screenshot("custom-desktop");
+  await visit("/"); await page.setViewportSize({ width: 390, height: 844 }); await screenshot("home-mobile");
+  expect(errors).toEqual([]);
+  console.log("PASS: vertical desktop/mobile menus, keyboard dismissal, category links, 48 swatches, fabric-to-form selection, multi-image upload/removal, linked WhatsApp text, retry/fallback, file validation, branding/SEO, redirects and responsive routes.");
+} finally { await browser.close(); }

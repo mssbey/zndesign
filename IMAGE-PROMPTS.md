@@ -1,6 +1,6 @@
 ﻿# Image generation provenance
 
-All nine assets were created with the built-in image_gen tool and saved locally in public/images. WebP optimization uses Sharp; no third-party brand photographs are used. These are illustrative demo assets, not verified ZN Design inventory or store photography.
+All nine assets were created with the built-in image_gen tool and saved locally in public/images. WebP optimization uses Sharp; no third-party brand photographs are used. These are illustrative demo assets, not verified Zenn Bedding inventory or store photography.
 
 Prompts used (shared constraints: landscape 3:2, warm muted cream/beige palette, natural daylight, realistic tactile fabric, no text, logos, watermark or people):
 

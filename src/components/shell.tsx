@@ -3,38 +3,67 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Brand, Arrow } from "./shared";
-import { categories, site } from "@/lib/data";
+import { categories, collections, site } from "@/lib/data";
 import { whatsappUrl } from "@/lib/contact";
-const links = [
-  ["/", "Ana Sayfa"],
-  ["/urunler", "Ürünler"],
-  ["/koleksiyonlar", "Koleksiyonlar"],
-  ["/ozel-uretim", "Özel Üretim"],
-  ["/hakkimizda", "Hakkımızda"],
-  ["/iletisim", "İletişim"],
-];
+
+const links = [["/ozel-uretim", "Özel Üretim"], ["/kumas-renk-kartelasi", "Kumaş & Renk"], ["/biz-kimiz", "Biz Kimiz"], ["/iletisim", "İletişim"]];
+
+function MenuChevron() {
+  return <svg className="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" /></svg>;
+}
+
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const path = usePathname();
+  const header = useRef<HTMLElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
-  return (
-    <header className={`wd-header ${path === "/" ? "wd-home-header" : ""}`}>
-      <div className="wd-topbar"><div className="wrap"><span>TÜRKÇE <span aria-hidden="true">⌄</span> <b> TÜRKİYE</b></span><span>YAŞAM ALANINIZA TASARIM, UYKUNUZA KONFOR</span><div><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim">İLETİŞİM</Link><Link href="/hakkimizda">HAKKIMIZDA</Link></div></div></div>
-      <div className="wrap wd-main-header">
-        <button ref={toggle} className="menu-toggle" aria-label={open ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={open} aria-controls="navigation" onClick={() => setOpen(!open)}>{open ? "✕" : "☰"}</button>
-        <Link href="/" aria-label="ZN Design ana sayfa"><Brand /></Link>
-        <form action="/urunler" className="wd-search" role="search"><input name="q" type="search" aria-label="Ürünlerde ara" placeholder="Ürünlerde ara..."/><select name="kategori" aria-label="Arama kategorisi"><option value="">TÜM KATEGORİLER</option>{categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</select><button aria-label="Ara" type="submit"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg></button></form>
-        <div className="wd-header-actions"><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim" aria-label="Bilgi ve fiyat alın"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 11a8 8 0 0 1-8 8H4l-2 3V11a9 9 0 0 1 18 0Z"/><path d="M7 10h8M7 14h5"/></svg><span>Bilgi & Fiyat</span></Link></div>
-      </div>
-      <div className="wd-nav-border"><div className="wrap wd-nav-row">
-        <div className="wd-category-menu"><button onClick={() => setCategoryOpen(!categoryOpen)} aria-expanded={categoryOpen} aria-controls="header-categories"><span>☰</span> TÜM KATEGORİLER <span>⌄</span></button>{categoryOpen && <div id="header-categories" onKeyDown={e => {if(e.key === "Escape") setCategoryOpen(false);}}>{categories.map(c => <Link key={c.slug} href={`/urunler?kategori=${c.slug}`} onClick={() => setCategoryOpen(false)}>{c.name}<span>&gt;</span></Link>)}</div>}</div>
-        <nav id="navigation" aria-label="Ana menü" className={open ? "wd-navigation open" : "wd-navigation"} onKeyDown={e => {if(e.key === "Escape") {setOpen(false);toggle.current?.focus();}}}>{links.map(([url,label]) => <Link key={url} href={url} aria-current={path === url ? "page" : undefined} onClick={() => setOpen(false)}>{label}</Link>)}</nav>
-        <Link className="wd-offers" href="/urunler?kampanya=1">ÖZEL FIRSATLAR</Link>
-      </div></div>
-    </header>
-  );
+  const productToggle = useRef<HTMLButtonElement>(null);
+  const collectionToggle = useRef<HTMLButtonElement>(null);
+  const allToggle = useRef<HTMLButtonElement>(null);
+  function close() { setOpen(false); setExpanded(null); }
+  useEffect(() => {
+    function outside(event: PointerEvent) {
+      if (!header.current?.contains(event.target as Node)) { setExpanded(null); setOpen(false); }
+    }
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, []);
+  return <header className={`wd-header ${path === "/" ? "wd-home-header" : ""}`} ref={header} onKeyDown={event => {
+    if (event.key === "Escape") {
+      if (expanded) { (expanded === "products" ? productToggle : expanded === "collections" ? collectionToggle : allToggle).current?.focus(); setExpanded(null); }
+      else { setOpen(false); toggle.current?.focus(); }
+    }
+  }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) close(); }}>
+    <div className="wd-topbar"><div className="wrap"><span>TÜRKÇE <MenuChevron /> <b> TÜRKİYE</b></span><span>YAŞAM ALANINIZA TASARIM, UYKUNUZA KONFOR</span><div><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim">İLETİŞİM</Link><Link href="/biz-kimiz">BİZ KİMİZ</Link></div></div></div>
+    <div className="wrap wd-main-header">
+      <button ref={toggle} className="menu-toggle" aria-label={open ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={open} aria-controls="navigation" onClick={() => { setOpen(!open); setExpanded(null); }}>{open ? "✕" : "☰"}</button>
+      <Link href="/" aria-label="Zenn Bedding ana sayfa" onClick={close}><Brand /></Link>
+      <form action="/urunler" className="wd-search" role="search"><input name="q" type="search" aria-label="Ürünlerde ara" placeholder="Ürünlerde ara..."/><select name="kategori" aria-label="Arama kategorisi"><option value="">TÜM KATEGORİLER</option>{categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</select><button aria-label="Ara" type="submit"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg></button></form>
+      <div className="wd-header-actions"><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim" aria-label="Bilgi ve fiyat alın"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 11a8 8 0 0 1-8 8H4l-2 3V11a9 9 0 0 1 18 0Z"/><path d="M7 10h8M7 14h5"/></svg><span>Bilgi & Fiyat</span></Link></div>
+    </div>
+    <div className="wd-nav-border"><div className="wrap wd-nav-row">
+      <div className="wd-category-menu"><button ref={allToggle} aria-expanded={expanded === "all"} aria-controls="header-categories" onClick={() => setExpanded(expanded === "all" ? null : "all")}><span>☰</span> TÜM KATEGORİLER <MenuChevron /></button><div id="header-categories" hidden={expanded !== "all"}>{categories.map(c => <Link href={`/urunler?kategori=${c.slug}`} key={c.slug} onClick={close}>{c.name}<span>&gt;</span></Link>)}</div></div>
+      <nav id="navigation" aria-label="Ana menü" className={`wd-navigation ${open ? "open" : ""}`}>
+        <Link href="/" aria-current={path === "/" ? "page" : undefined} onClick={close}>Ana Sayfa</Link>
+        <Link href="/biz-kimiz" aria-current={path === "/biz-kimiz" ? "page" : undefined} onClick={close}>Biz Kimiz</Link>
+        {[
+          { id: "products", label: "Ürünler", href: "/urunler", ref: productToggle, items: categories.map(c => ({ name: c.name, href: `/urunler?kategori=${c.slug}` })) },
+          { id: "collections", label: "Koleksiyonlar", href: "/koleksiyonlar", ref: collectionToggle, items: collections.map(c => ({ name: c.name, href: `/koleksiyonlar/${c.slug}` })) },
+        ].map(group => <div className="zenn-nav-group" key={group.id}>
+          <button ref={group.ref} className={path.startsWith(group.href) ? "is-active" : ""} aria-expanded={expanded === group.id} aria-controls={`nav-${group.id}`} onClick={() => setExpanded(expanded === group.id ? null : group.id)}>{group.label}<MenuChevron /></button>
+          <div className="zenn-submenu" id={`nav-${group.id}`} hidden={expanded !== group.id}>
+            {group.items.map(item => <Link key={item.href} href={item.href} onClick={close}>{item.name}<span aria-hidden="true">↗</span></Link>)}
+            <Link className="submenu-all" href={group.href} onClick={close}>Tüm {group.label.toLocaleLowerCase("tr")} <Arrow /></Link>
+          </div>
+        </div>)}
+        {links.filter(([href]) => href !== "/biz-kimiz").map(([href, label]) => <Link href={href} key={href} aria-current={path === href ? "page" : undefined} onClick={close}>{label}</Link>)}
+      </nav>
+      <Link className="wd-offers" href="/urunler?kampanya=1" onClick={close}>ÖZEL FIRSATLAR</Link>
+    </div></div>
+  </header>;
 }
+
 export function Footer() {
   return (
     <footer>
@@ -48,10 +77,10 @@ export function Footer() {
             <br />
             buluştuğu yer.
           </p>
-          <small>ZN Design | Uyku & Yaşam</small>
+          <small>Zenn Bedding | Uyku & Yaşam</small>
         </div>
         <div>
-          <h3>KOLEKSİYONU KEŞFEDİN</h3>
+          <h3>ÜRÜNLERİ KEŞFEDİN</h3>
           {categories.map((c) => (
             <Link key={c.slug} href={`/urunler?kategori=${c.slug}`}>
               {c.name}
@@ -59,18 +88,18 @@ export function Footer() {
           ))}
         </div>
         <div>
-          <h3>ZN DESIGN</h3>
-          {links.slice(2).map(([url, label]) => (
+          <h3>Zenn Bedding</h3>
+          {links.map(([url, label]) => (
             <Link href={url} key={url}>
               {label}
             </Link>
           ))}
-          <Link href="/magazamiz">Mağazamız</Link>
+          <Link href="/koleksiyonlar">Koleksiyonlar</Link><Link href="/magazamiz">Mağazamız</Link><Link href="/fabrikamiz">Fabrikamız</Link>
         </div>
         <div>
           <h3>BİZİ ZİYARET EDİN</h3>
           <p>{site.address}</p>
-          {site.phone && <a href={`tel:${site.phone}`}>{site.phone}</a>}
+          {site.phone && <a href={`tel:${site.phone}`}>{site.phone}</a>}<a href={whatsappUrl("Merhaba, Zenn Bedding ürünleri hakkında bilgi almak istiyorum.")}>WhatsApp’tan İletişime Geçin</a>
           <Link href="/iletisim" className="text-link">
             Birlikte konuşalım <Arrow />
           </Link>
@@ -78,7 +107,7 @@ export function Footer() {
       </div>
       <div className="wrap footer-bottom">
         <span>
-          © {new Date().getFullYear()} ZN Design. Tüm hakları saklıdır.
+          © {new Date().getFullYear()} Zenn Bedding. Tüm hakları saklıdır.
         </span>
         <span>Ürün ve koleksiyonlar örnektir. Görseller temsilidir.</span>
       </div>
@@ -98,7 +127,7 @@ export function FloatingContact() {
     <a
       className={`floating-contact ${/^\/urunler\/.+/.test(path) ? "on-product" : ""}`}
       href={whatsappUrl(
-        "Merhaba, ZN Design ürünleri hakkında bilgi almak istiyorum.",
+        "Merhaba, Zenn Bedding ürünleri hakkında bilgi almak istiyorum.",
       )}
       aria-label="WhatsApp üzerinden bilgi alın"
     >
