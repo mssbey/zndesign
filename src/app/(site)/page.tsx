@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Photo } from "@/components/shared";
 import { HomeSlider, FeaturedProducts, References } from "@/components/woodmart-home";
 import { categories, collections, site } from "@/lib/data";
+import { CategoryCards } from "@/components/category-cards";
 import { FactoryGallery } from "@/components/factory-gallery";
 import { whatsappUrl } from "@/lib/contact";
 import { getProducts } from "@/lib/db";
@@ -14,7 +15,7 @@ export default async function Home() {
       {categories.map((c, i) => <Link key={c.slug} href={`/urunler?kategori=${c.slug}`}><span className="wd-category-icon" aria-hidden="true">{["▱", "▤", "▥", "▰", "▧", "◇", "☆"][i]}</span>{c.name}<span className="wd-chevron">&gt;</span></Link>)}
       {[ ["/koleksiyonlar", "◇", "Koleksiyonlar"], ["/ozel-uretim", "✂", "Özel Üretim"], ["/kumas-renk-kartelasi", "▧", "Kumaş & Renk Kartelası"], ["/urunler?yeni=1", "✧", "Yeni Ürünler"], ["/urunler?kampanya=1", "%", "Kampanyalar"] ].map(([href, icon, label]) => <Link href={href} key={href}><span className="wd-category-icon">{icon}</span>{label}<span className="wd-chevron">&gt;</span></Link>)}
     </aside><HomeSlider/></div></section>
-    <section className="wrap wd-section" id="kategoriler"><div className="wd-section-heading"><p>Zenn Bedding KOLEKSİYONLARI</p><h2>ÖNE ÇIKAN KATEGORİLER</h2><p>Yaşam alanınız için tasarlanan konforlu ve zamansız seçenekler.</p></div><div className="wd-category-list wd-category-list-vertical">{categories.map(c => <Link href={`/urunler?kategori=${c.slug}`} key={c.slug}>{c.name}<span aria-hidden="true">&gt;</span></Link>)}</div></section>
+    <CategoryCards />
     <section className="wrap wd-section wd-featured"><div className="wd-section-heading"><p>Zenn Bedding UYKU & YAŞAM</p><h2>ÖNE ÇIKAN ÜRÜNLER</h2><p>Yatak odanıza yeni bir dokunuş katacak modellerimizi keşfedin.</p></div><FeaturedProducts products={products}/></section>
     <section className="wd-spotlight"><div className="wrap"><div className="wd-spotlight-image"><Photo src="/images/modern.webp" alt="Modern Konfor yatak odası koleksiyonu"/></div><div className="wd-spotlight-copy"><p>KOLEKSİYONU YAKINDAN TANIYIN</p><h2>Modern Konfor –<br/>Zamansız Tasarım.</h2><div className="wd-specs"><div><b>TASARIM</b><span>Zenn Bedding</span></div><div><b>DOKULAR</b><span>Keten, bukle, kadife</span></div><div><b>SEÇENEKLER</b><span>Size özel ölçüler</span></div></div><Link href="/koleksiyonlar/modern-koleksiyon" className="button outline">KOLEKSİYONU İNCELE</Link></div></div></section>
     <section className="wrap wd-about"><div><p>YAŞAM ALANINIZ İÇİN HER DETAY</p><h2>Zenn Bedding – Uyku & Yaşam</h2><p>Konfor, özenli işçilik ve zamansız tasarımı bir araya getiriyoruz. Baza, başlık ve yataklarımızı kendi tesisimizde üretiyor; ölçü, kumaş ve renk seçeneklerini sizinle birlikte belirliyoruz.</p><div className="wd-about-actions"><Link href="/biz-kimiz" className="button">BİZ KİMİZ</Link><Link href="/iletisim" className="button outline">İLETİŞİME GEÇİN</Link></div></div><Photo src="/images/headboard.webp" alt="Zenn Bedding döşemeli başlık detayları"/></section>
