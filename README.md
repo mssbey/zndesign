@@ -19,6 +19,8 @@ npm run dev -- --port 3001
 - `NEXT_PUBLIC_LOGO_PATH`: isteğe bağlı logo yolu. Mevcut orijinal logo kullanılır; erişilebilir adı Zenn Bedding’dir.
 - Ana sayfa mevcut mağaza tasarımını kullanır: arama ve sol kategori alanı, büyük slayt, sekmeli ürün kaydırıcısı, koyu koleksiyon bandı, marka tanıtımı, referanslar ve hizmet şeridi. Dikey alt menüler, kartela ve form ekleri `zenn.css` içinde mevcut tasarıma uyarlanmıştır.
 - `NEXT_PUBLIC_FACTORY_IMAGES`: yalnızca gerçek fabrika fotoğraflarının virgülle ayrılan dosya yolları veya URL’leri. Örnek: `/images/fabrika-1.webp,/images/fabrika-2.webp`. Boşken temsili fabrika fotoğrafı gösterilmez.
+- `/admin/gallery`: **Fabrika ve Teslimatlar** yönetimi. Fotoğrafı seçin, kategori/açıklama/sıra girin ve “Galeriye ekle”ye basın. JPG/PNG/WEBP, görsel başına en fazla 3 MB. Fotoğraf, açıklama, kategori ve sıra sonradan değiştirilebilir; kayıtlar galeriden kaldırılabilir. Küçük sıra değerleri önce, aynı sıradaki yeni kayıtlar üstte görünür.
+- Galeri mevcut `DATABASE_URL` ile Neon’daki ayrı `company_gallery` tablosunu (ilk kullanımda oluşturulur), fotoğraflar mevcut `BLOB_READ_WRITE_TOKEN` ile Vercel Blob’u kullanır. Yönetim için mevcut admin oturumu gerekir. Galeri güncellemeleri yeniden build gerektirmez. Fabrika fotoğrafları `/biz-kimiz`, `/fabrikamiz` ve ana sayfada; teslimatlar `/biz-kimiz` içinde gösterilir. Fotoğraf yokken gerçek fotoğraf yerine temsili görsel kullanılmaz. Galeriden kaldırılan/değiştirilen dosyanın bağlantısını bozmamak için orijinal Blob dosyası saklanır.
 - `NEXT_PUBLIC_FACTORY_ADDRESS`: doğrulanmış fabrika adresi. Boşken mağaza adresi fabrika adresi olarak kullanılmaz; ziyaret için iletişime yönlendirilir.
 - `src/lib/fabrics.ts`: Baby Face, Luna, Teddy, Puffy, Muzzy, Anka, Coco, Bukle grupları. Renk adları ve CSS dokuları açıkça temsili önizlemelerdir; gerçek tedarikçi kodları/görselleri geldiğinde buradaki `colors` verisi ve `image` alanı güncellenir. Kumaş seçimi özel üretim formuna aktarılır.
 - NEXT_PUBLIC değişkenleri değişince yeniden build alınır.
@@ -36,6 +38,9 @@ npm run lint
 npm run build
 node tests/contact.mjs
 node tests/reference-images.mjs
+node tests/gallery.mjs
+# Build sonrası kendi geçici 3011 sunucusunda yönetim ekranı kontrolü:
+node tests/gallery-browser.mjs
 npx playwright install chromium
 # Üretim sunucusu localhost:3001 üzerinde çalışırken:
 node tests/revisions.mjs

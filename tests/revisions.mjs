@@ -20,7 +20,7 @@ try {
   await expect(page.getByRole("search")).toBeVisible();
   await expect(page.locator(".wd-sidebar")).toBeVisible();
   for (const section of [".wd-slider", ".wd-product-tabs", ".wd-product-carousel", ".wd-spotlight", ".wd-about", ".wd-contact-banner", ".wd-collection-list", ".wd-references", ".wd-service-strip"]) await expect(page.locator(section).first()).toBeVisible();
-  expect(await page.locator(".woodmart-site").evaluate(el => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
+  expect(await page.locator(".woodmart-site").evaluate(el => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 253, 250)");
   expect(await page.locator("h1").evaluate(el => getComputedStyle(el).fontFamily)).toContain("Poppins");
   await page.getByRole("button", { name: "Sonraki slayt" }).click();
   await expect(page.locator(".wd-slide-image")).toHaveAttribute("href", "/koleksiyonlar/modern-koleksiyon");
@@ -33,7 +33,8 @@ try {
   const nav = page.getByRole("navigation", { name: "Ana menü" });
   await nav.getByRole("button", { name: "Ürünler", exact: true }).click();
   await expect(page.locator("#nav-products")).toBeVisible();
-  await expect(page.locator("#nav-products a")).toHaveText(["Baza↗", "Başlık↗", "Yatak↗", "Komodin↗", "Puf↗", "Sehpa↗", "Diğer Ürünler↗", "Tüm ürünler >"]);
+  await expect(page.locator("#nav-products a")).toHaveText(["Baza", "Başlık", "Yatak", "Komodin", "Puf", "Sehpa", "Diğer Ürünler", "Tüm ürünler"]);
+  await expect(page.locator("#nav-products a > svg")).toHaveCount(8);
   const boxes = await page.locator("#nav-products a").evaluateAll(items => items.map(el => ({ x: el.getBoundingClientRect().x, y: el.getBoundingClientRect().y })));
   expect(boxes.every((box, i) => !i || box.x === boxes[i - 1].x && box.y > boxes[i - 1].y)).toBe(true);
   await screenshot("menu-desktop");
@@ -120,6 +121,16 @@ try {
     await page.setViewportSize({ width: 1440, height: 1000 }); await noOverflow(`${route} 1440px`);
   }
   await visit("/hakkimizda"); await expect(page).toHaveURL(base + "/biz-kimiz");
+  await expect(page.locator(".company-gallery")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Fabrikamız", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await screenshot("about-gallery-desktop");
+  await page.getByRole("button", { name: "Teslimatlarımız", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Teslimatlarımız", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#company-gallery-results")).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 844 });
+  await noOverflow("gallery 320px");
+  await screenshot("about-gallery-mobile");
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await visit("/koleksiyonlar/sade-yasam"); await expect(page).toHaveURL(base + "/koleksiyonlar/bohem-koleksiyon");
   await visit("/koleksiyonlar/modern-konfor"); await expect(page).toHaveURL(base + "/koleksiyonlar/modern-koleksiyon");
   await visit("/koleksiyonlar/kids-dunyasi"); await expect(page).toHaveURL(base + "/koleksiyonlar/kids-collection");

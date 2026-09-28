@@ -5,6 +5,8 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { collections, collectionAliases, site, mapsUrl } from "@/lib/data";
 import { FabricCatalog } from "@/components/fabric-catalog";
 import { FactoryGallery } from "@/components/factory-gallery";
+import { CompanyGallery } from "@/components/company-gallery";
+import { getGallery } from "@/lib/gallery";
 import { whatsappUrl } from "@/lib/contact";
 import { getProducts, getProductBySlug } from "@/lib/db";
 import {
@@ -268,6 +270,7 @@ export default async function Page({
           </p>
           <p>Ölçü, kumaş, renk ve tasarım seçeneklerini birlikte değerlendirerek ihtiyacınıza uygun çözümler oluşturuyoruz. Fabrikamızı ziyaret edin, ürünleri ve kumaşları yerinde inceleyin.</p>
         </section>
+        <CompanyGallery items={await getGallery()} />
         <StoreInvite />
       </>
     );

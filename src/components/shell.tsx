@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { SiteIcon } from "./site-icon";
 import { Brand, Arrow } from "./shared";
 import { categories, collections, site } from "@/lib/data";
 import { whatsappUrl } from "@/lib/contact";
@@ -37,13 +38,13 @@ export function Header() {
   }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) close(); }}>
     <div className="wd-topbar"><div className="wrap"><span>TÜRKÇE <MenuChevron /> <b> TÜRKİYE</b></span><span>YAŞAM ALANINIZA TASARIM, UYKUNUZA KONFOR</span><div><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim">İLETİŞİM</Link><Link href="/biz-kimiz">BİZ KİMİZ</Link></div></div></div>
     <div className="wrap wd-main-header">
-      <button ref={toggle} className="menu-toggle" aria-label={open ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={open} aria-controls="navigation" onClick={() => { setOpen(!open); setExpanded(null); }}>{open ? "✕" : "☰"}</button>
+      <button ref={toggle} className="menu-toggle" aria-label={open ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={open} aria-controls="navigation" onClick={() => { setOpen(!open); setExpanded(null); }}><SiteIcon name={open ? "close" : "menu"} width={24} height={24} /></button>
       <Link href="/" aria-label="Zenn Bedding ana sayfa" onClick={close}><Brand /></Link>
       <form action="/urunler" className="wd-search" role="search"><input name="q" type="search" aria-label="Ürünlerde ara" placeholder="Ürünlerde ara..."/><select name="kategori" aria-label="Arama kategorisi"><option value="">TÜM KATEGORİLER</option>{categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}</select><button aria-label="Ara" type="submit"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg></button></form>
       <div className="wd-header-actions"><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim" aria-label="Bilgi ve fiyat alın"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 11a8 8 0 0 1-8 8H4l-2 3V11a9 9 0 0 1 18 0Z"/><path d="M7 10h8M7 14h5"/></svg><span>Bilgi & Fiyat</span></Link></div>
     </div>
     <div className="wd-nav-border"><div className="wrap wd-nav-row">
-      <div className="wd-category-menu"><button ref={allToggle} aria-expanded={expanded === "all"} aria-controls="header-categories" onClick={() => setExpanded(expanded === "all" ? null : "all")}><span>☰</span> TÜM KATEGORİLER <MenuChevron /></button><div id="header-categories" hidden={expanded !== "all"}>{categories.map(c => <Link href={`/urunler?kategori=${c.slug}`} key={c.slug} onClick={close}>{c.name}<span>&gt;</span></Link>)}</div></div>
+      <div className="wd-category-menu"><button ref={allToggle} aria-expanded={expanded === "all"} aria-controls="header-categories" onClick={() => setExpanded(expanded === "all" ? null : "all")}><SiteIcon name="menu" /> TÜM KATEGORİLER <MenuChevron /></button><div id="header-categories" hidden={expanded !== "all"}>{categories.map(c => <Link href={`/urunler?kategori=${c.slug}`} key={c.slug} onClick={close}>{c.name}<SiteIcon name="chevron" width={14} height={14} /></Link>)}</div></div>
       <nav id="navigation" aria-label="Ana menü" className={`wd-navigation ${open ? "open" : ""}`}>
         <Link href="/" aria-current={path === "/" ? "page" : undefined} onClick={close}>Ana Sayfa</Link>
         <Link href="/biz-kimiz" aria-current={path === "/biz-kimiz" ? "page" : undefined} onClick={close}>Biz Kimiz</Link>
@@ -53,8 +54,8 @@ export function Header() {
         ].map(group => <div className="zenn-nav-group" key={group.id}>
           <button ref={group.ref} className={path.startsWith(group.href) ? "is-active" : ""} aria-expanded={expanded === group.id} aria-controls={`nav-${group.id}`} onClick={() => setExpanded(expanded === group.id ? null : group.id)}>{group.label}<MenuChevron /></button>
           <div className="zenn-submenu" id={`nav-${group.id}`} hidden={expanded !== group.id}>
-            {group.items.map(item => <Link key={item.href} href={item.href} onClick={close}>{item.name}<span aria-hidden="true">↗</span></Link>)}
-            <Link className="submenu-all" href={group.href} onClick={close}>Tüm {group.label.toLocaleLowerCase("tr")} <Arrow /></Link>
+            {group.items.map(item => <Link key={item.href} href={item.href} onClick={close}>{item.name}<SiteIcon name="chevron" width={14} height={14} /></Link>)}
+            <Link className="submenu-all" href={group.href} onClick={close}>Tüm {group.label.toLocaleLowerCase("tr")} <SiteIcon name="chevron" width={14} height={14} /></Link>
           </div>
         </div>)}
         {links.filter(([href]) => href !== "/biz-kimiz").map(([href, label]) => <Link href={href} key={href} aria-current={path === href ? "page" : undefined} onClick={close}>{label}</Link>)}

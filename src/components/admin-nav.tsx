@@ -4,9 +4,10 @@ export function AdminNav() {
   return (
     <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
       <Link href="/admin" className="text-lg font-semibold">
-        Zenn Bedding · Ürün Yönetimi
+        Zenn Bedding · Yönetim
       </Link>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/admin/gallery" className="text-sm underline">Fabrika ve Teslimatlar</Link>
         <Link href="/admin/products/new" className="text-sm underline">
           + Yeni Ürün
         </Link>
