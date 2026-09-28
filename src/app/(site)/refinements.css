@@ -15,8 +15,8 @@
 .wd-topbar, .wd-category-menu > button { background: #382f28; }
 .wd-nav-border, .wd-search, .wd-search select { border-color: var(--line); }
 .woodmart-site .wd-search :is(input, select) { background: var(--light); }
-.wd-hero-area { background: #eee5d9; }
-.wd-slider { background: #f3ece2; }
+.wd-hero-area { background: #fff; }
+.wd-slider { background: #fff; }
 .wd-sidebar { background: var(--light); border-color: var(--line); }
 .wd-sidebar > a, .wd-category-menu > div > a { border-color: var(--line); }
 .wd-sidebar > a:hover, .woodmart-site .zenn-submenu > a:hover { background: var(--cream); }
