@@ -8,6 +8,7 @@ export function AdminNav() {
       </Link>
       <div className="flex flex-wrap items-center gap-4">
         <Link href="/admin/taxonomy" className="text-sm underline">Kategoriler ve Koleksiyonlar</Link>
+        <Link href="/admin/slider" className="text-sm underline">Ana Sayfa Slider</Link>
         <Link href="/admin/gallery" className="text-sm underline">Fabrika ve Teslimatlar</Link>
         <Link href="/admin/products/new" className="text-sm underline">
           + Yeni Ürün

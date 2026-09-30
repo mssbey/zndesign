@@ -8,15 +8,16 @@ import { CategoryCards } from "@/components/category-cards";
 import { FactoryGallery } from "@/components/factory-gallery";
 import { whatsappUrl } from "@/lib/contact";
 import { getProducts } from "@/lib/db";
+import { defaultSlides, getSlides } from "@/lib/slides";
 export const dynamic = "force-dynamic";
 export const metadata = { ...(site.domain ? { alternates: { canonical: site.domain.replace(/\/$/, "") } } : {}) };
 export default async function Home() {
-  const [products, categories, collections] = await Promise.all([getProducts(), getCategories(), getCollections()]);
+  const [products, categories, collections, slides] = await Promise.all([getProducts(), getCategories(), getCollections(), getSlides().catch(() => defaultSlides)]);
   return <>
     <section className="wd-hero-area"><div className="wrap wd-hero-layout"><aside className="wd-sidebar" aria-label="Ürün kategorileri">
       {categories.map(c => <Link key={c.slug} href={`/urunler?kategori=${c.slug}`}><span className="wd-category-icon"><SiteIcon name={categoryIcons[c.slug] ?? "grid"} /></span>{c.name}<SiteIcon name="chevron" className="wd-chevron" width={14} height={14} /></Link>)}
       {[ ["/koleksiyonlar", "layers", "Koleksiyonlar"], ["/ozel-uretim", "ruler", "Özel Üretim"], ["/kumas-renk-kartelasi", "fabric", "Kumaş & Renk Kartelası"], ["/urunler?yeni=1", "sparkle", "Yeni Ürünler"], ["/urunler?kampanya=1", "tag", "Kampanyalar"] ].map(([href, icon, label]) => <Link href={href} key={href}><span className="wd-category-icon"><SiteIcon name={icon as IconName} /></span>{label}<SiteIcon name="chevron" className="wd-chevron" width={14} height={14} /></Link>)}
-    </aside><HomeSlider/></div></section>
+    </aside><HomeSlider slides={slides}/></div></section>
     <CategoryCards />
     <section className="wrap wd-section wd-featured"><div className="wd-section-heading"><p>Zenn Bedding UYKU & YAŞAM</p><h2>ÖNE ÇIKAN ÜRÜNLER</h2><p>Yatak odanıza yeni bir dokunuş katacak modellerimizi keşfedin.</p></div><FeaturedProducts products={products}/></section>
     <section className="wd-spotlight"><div className="wrap"><div className="wd-spotlight-image"><Photo src="/images/modern.webp" alt="Modern Konfor yatak odası koleksiyonu"/></div><div className="wd-spotlight-copy"><p>KOLEKSİYONU YAKINDAN TANIYIN</p><h2>Modern Konfor –<br/>Zamansız Tasarım.</h2><div className="wd-specs"><div><b>TASARIM</b><span>Zenn Bedding</span></div><div><b>DOKULAR</b><span>Keten, bukle, kadife</span></div><div><b>SEÇENEKLER</b><span>Size özel ölçüler</span></div></div><Link href="/koleksiyonlar/modern-koleksiyon" className="button outline">KOLEKSİYONU İNCELE</Link></div></div></section>
