@@ -6,8 +6,10 @@ import {
   createProduct,
   deleteProduct,
   getProductBySlug,
+  reorderProducts,
   updateProduct,
 } from "@/lib/db";
+import { taxonomyExists } from "@/lib/taxonomy";
 import {
   SESSION_COOKIE_NAME,
   createSessionToken,
@@ -57,18 +59,28 @@ function parseList(value: FormDataEntryValue | null): string[] {
     .filter(Boolean);
 }
 
-async function collectGalleryExtras(formData: FormData): Promise<string[]> {
+/** Kept images in the order chosen in the form (only the product's own images are accepted), then new uploads. */
+async function collectGalleryExtras(formData: FormData, owned: string[], cover: string): Promise<string[]> {
+  let kept: string[] = [];
+  try {
+    const parsed: unknown = JSON.parse(String(formData.get("existingGalleryExtra") || "[]"));
+    if (Array.isArray(parsed)) kept = parsed.filter((src): src is string => typeof src === "string" && owned.includes(src));
+  } catch {}
   const files = formData
     .getAll("gallery")
     .filter((f): f is File => f instanceof File && f.size > 0);
-  if (files.length === 0) {
-    return parseList(formData.get("existingGalleryExtra"));
-  }
   const uploaded: string[] = [];
   for (const file of files) {
     uploaded.push(await saveUploadedImage(file));
   }
-  return uploaded;
+  return [...new Set([...kept, ...uploaded])].filter((src) => src !== cover);
+}
+
+async function validateTaxonomy(category: string, collection: string): Promise<string | undefined> {
+  if (!category) return "Kategori seçin.";
+  if (!collection) return "Koleksiyon seçin.";
+  if (!(await taxonomyExists("category", category))) return "Seçilen kategori artık yok. Sayfayı yenileyin.";
+  if (!(await taxonomyExists("collection", collection))) return "Seçilen koleksiyon artık yok. Sayfayı yenileyin.";
 }
 
 export async function createProductAction(
@@ -87,8 +99,8 @@ export async function createProductAction(
 
   if (!name) return { error: "Ürün adı zorunludur." };
   if (!slug) return { error: "Geçerli bir URL (slug) girin." };
-  if (!category) return { error: "Kategori seçin." };
-  if (!collection) return { error: "Koleksiyon seçin." };
+  const taxonomyError = await validateTaxonomy(category, collection);
+  if (taxonomyError) return { error: taxonomyError };
   if (!(coverFile instanceof File) || coverFile.size === 0) {
     return { error: "Kapak görseli zorunludur." };
   }
@@ -105,7 +117,7 @@ export async function createProductAction(
 
   let galleryExtra: string[];
   try {
-    galleryExtra = await collectGalleryExtras(formData);
+    galleryExtra = await collectGalleryExtras(formData, [], image);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Galeri görseli yüklenemedi." };
   }
@@ -151,13 +163,17 @@ export async function updateProductAction(
 
   if (!name) return { error: "Ürün adı zorunludur." };
   if (!slug) return { error: "Geçerli bir URL (slug) girin." };
-  if (!category) return { error: "Kategori seçin." };
-  if (!collection) return { error: "Koleksiyon seçin." };
+  if (category !== existing.category || collection !== existing.collection) {
+    const taxonomyError = await validateTaxonomy(category, collection);
+    if (taxonomyError) return { error: taxonomyError };
+  }
   if (slug !== originalSlug && (await getProductBySlug(slug))) {
     return { error: "Bu URL (slug) zaten kullanılıyor. Başka bir tane deneyin." };
   }
 
-  let image = existing.image;
+  const owned = [existing.image, ...existing.gallery];
+  const chosenCover = String(formData.get("existingCover") || "");
+  let image = owned.includes(chosenCover) ? chosenCover : existing.image;
   if (coverFile instanceof File && coverFile.size > 0) {
     try {
       image = await saveUploadedImage(coverFile);
@@ -168,7 +184,7 @@ export async function updateProductAction(
 
   let galleryExtra: string[];
   try {
-    galleryExtra = await collectGalleryExtras(formData);
+    galleryExtra = await collectGalleryExtras(formData, owned, image);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Galeri görseli yüklenemedi." };
   }
@@ -203,4 +219,13 @@ export async function deleteProductAction(slug: string) {
   revalidatePath("/urunler");
   revalidatePath("/admin");
   redirect("/admin");
+}
+
+export async function reorderProductsAction(slugs: string[]): Promise<FormState> {
+  await requireAdmin();
+  if (!(await reorderProducts(slugs))) {
+    return { error: "Ürün listesi değişmiş. Sayfayı yenileyip tekrar deneyin." };
+  }
+  revalidatePath("/", "layout");
+  return {};
 }

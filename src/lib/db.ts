@@ -37,7 +37,7 @@ const sql = neon(process.env.DATABASE_URL!);
 
 let initPromise: Promise<void> | null = null;
 
-function ensureInit(): Promise<void> {
+export function ensureInit(): Promise<void> {
   if (!initPromise) {
     initPromise = (async () => {
       await sql.query(`
@@ -57,8 +57,13 @@ function ensureInit(): Promise<void> {
           description TEXT NOT NULL DEFAULT ''
         );
       `);
+      // Existing rows share position 0 and keep their previous "newest first" order.
+      await sql.query("ALTER TABLE products ADD COLUMN IF NOT EXISTS position INTEGER NOT NULL DEFAULT 0");
       await seedIfEmpty();
-    })();
+    })().catch((error) => {
+      initPromise = null;
+      throw error;
+    });
   }
   return initPromise;
 }
@@ -175,7 +180,7 @@ function fromRow(row: ProductRow): Product {
 export async function getProducts(): Promise<Product[]> {
   await ensureInit();
   const rows = (await sql.query(
-    "SELECT * FROM products ORDER BY added DESC",
+    "SELECT * FROM products ORDER BY position, added DESC, slug",
   )) as unknown as ProductRow[];
   return rows.map(fromRow);
 }
@@ -195,8 +200,9 @@ export async function createProduct(input: ProductInput) {
   await ensureInit();
   await sql.query(
     `INSERT INTO products
-      (slug, name, category, collection, image, gallery, sizes, colors, fabrics, is_new, campaign, added, description)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+      (slug, name, category, collection, image, gallery, sizes, colors, fabrics, is_new, campaign, added, description, position)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+       (SELECT COALESCE(MIN(position), 0) - 1 FROM products))`,
     [
       input.slug,
       input.name,
@@ -243,4 +249,19 @@ export async function updateProduct(originalSlug: string, input: ProductInput) {
 export async function deleteProduct(slug: string) {
   await ensureInit();
   await sql.query("DELETE FROM products WHERE slug = $1", [slug]);
+}
+
+/** Stores the given slugs' order; `slugs` must list every product exactly once. */
+export async function reorderProducts(slugs: string[]): Promise<boolean> {
+  await ensureInit();
+  const current = (await sql.query("SELECT slug FROM products")) as { slug: string }[];
+  const known = new Set(current.map((r) => r.slug));
+  if (slugs.length !== known.size || new Set(slugs).size !== slugs.length || !slugs.every((s) => known.has(s))) return false;
+  await sql.query(
+    `UPDATE products SET position = o.pos - 1
+     FROM unnest($1::text[]) WITH ORDINALITY AS o(slug, pos)
+     WHERE products.slug = o.slug`,
+    [slugs],
+  );
+  return true;
 }

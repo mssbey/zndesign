@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { collections, collectionAliases, site, mapsUrl } from "@/lib/data";
+import { collectionAliases, site, mapsUrl } from "@/lib/data";
+import { getCollections } from "@/lib/taxonomy";
 import { FabricCatalog } from "@/components/fabric-catalog";
 import { FactoryGallery } from "@/components/factory-gallery";
 import { CompanyGallery } from "@/components/company-gallery";
@@ -57,7 +58,7 @@ export async function generateMetadata({
   const p = slug[0] === "urunler" && slug[1] ? await getProductBySlug(slug[1]) : null;
   const c =
     slug[0] === "koleksiyonlar"
-      ? collections.find((c) => c.slug === slug[1])
+      ? (await getCollections()).find((c) => c.slug === slug[1])
       : null;
   return {
     title: p?.name || c?.name || pages[slug[0]]?.[0] || "Sayfa bulunamadı",
@@ -114,6 +115,7 @@ export default async function Page({
       </>
     );
   }
+  const collections = page === "koleksiyonlar" ? await getCollections() : [];
   if (page === "koleksiyonlar" && !id)
     return (
       <>

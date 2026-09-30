@@ -1,10 +1,12 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { categories, categoryName, categoryAliases, Product } from "@/lib/data";
+import { categoryAliases, Product } from "@/lib/data";
+import { useTaxonomy } from "./taxonomy-provider";
 import { ProductGrid } from "./shared";
 export function Catalog({ products }: { products: Product[] }) {
   const params = useSearchParams();
+  const { categories, categoryName } = useTaxonomy();
   const [open, setOpen] = useState(false);
   const get = (k: string) => k === "kategori" ? categoryAliases[params.get(k) || ""] || params.get(k) || "" : params.get(k) || "";
   function change(key: string, value: string) {
@@ -31,12 +33,15 @@ export function Catalog({ products }: { products: Product[] }) {
         (!get("yeni") || p.isNew) &&
         (!get("kampanya") || p.campaign),
     )
+    // Products arrive in the order set in the admin panel; "Önerilen" keeps it.
     .sort((a, b) =>
       get("sirala") === "az"
         ? a.name.localeCompare(b.name, "tr")
         : get("sirala") === "za"
           ? b.name.localeCompare(a.name, "tr")
-          : b.added.localeCompare(a.added),
+          : get("sirala") === "yeni"
+            ? b.added.localeCompare(a.added)
+            : 0,
     );
   const active = Array.from(params.entries()).filter(([k]) => k !== "sirala");
   return (
@@ -149,7 +154,8 @@ export function Catalog({ products }: { products: Product[] }) {
                 value={get("sirala")}
                 onChange={(e) => change("sirala", e.target.value)}
               >
-                <option value="">Yeni eklenenler</option>
+                <option value="">Önerilen</option>
+                <option value="yeni">Yeni eklenenler</option>
                 <option value="az">Model adı: A–Z</option>
                 <option value="za">Model adı: Z–A</option>
               </select>

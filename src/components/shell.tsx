@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { SiteIcon } from "./site-icon";
 import { Brand, Arrow } from "./shared";
-import { categories, collections, site } from "@/lib/data";
+import { site } from "@/lib/data";
+import { useTaxonomy } from "./taxonomy-provider";
 import { whatsappUrl } from "@/lib/contact";
 
 const links = [["/ozel-uretim", "Özel Üretim"], ["/kumas-renk-kartelasi", "Kumaş & Renk"], ["/biz-kimiz", "Biz Kimiz"], ["/iletisim", "İletişim"]];
@@ -14,6 +15,7 @@ function MenuChevron() {
 }
 
 export function Header() {
+  const { categories, collections } = useTaxonomy();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const path = usePathname();
@@ -66,6 +68,7 @@ export function Header() {
 }
 
 export function Footer() {
+  const { categories } = useTaxonomy();
   return (
     <footer>
       <div className="wrap footer-grid">

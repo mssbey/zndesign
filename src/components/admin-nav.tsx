@@ -7,6 +7,7 @@ export function AdminNav() {
         Zenn Bedding · Yönetim
       </Link>
       <div className="flex flex-wrap items-center gap-4">
+        <Link href="/admin/taxonomy" className="text-sm underline">Kategoriler ve Koleksiyonlar</Link>
         <Link href="/admin/gallery" className="text-sm underline">Fabrika ve Teslimatlar</Link>
         <Link href="/admin/products/new" className="text-sm underline">
           + Yeni Ürün

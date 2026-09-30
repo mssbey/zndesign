@@ -1,6 +1,8 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Product, categoryName, colorHex, site } from "@/lib/data";
+import { Product, colorHex, site } from "@/lib/data";
+import { useTaxonomy } from "./taxonomy-provider";
 export function Arrow({}: { diagonal?: boolean }) {
   return <span aria-hidden="true">&gt;</span>;
 }
@@ -32,6 +34,7 @@ export function Brand() {
   return <span className="brand">{site.logo ? <Image src={site.logo} width={102} height={150} alt="Zenn Bedding" className="original-logo"/> : <><strong>Zenn Bedding</strong><small>UYKU & YAŞAM</small></>}</span>;
 }
 export function ProductCard({ product: p }: { product: Product }) {
+  const { categoryName } = useTaxonomy();
   return (
     <article className="product-card">
       <Link href={`/urunler/${p.slug}`} className="product-image">

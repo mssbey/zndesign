@@ -2,13 +2,15 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { categories, categoryAliases, site } from "@/lib/data";
+import { categoryAliases, site } from "@/lib/data";
+import { useTaxonomy } from "./taxonomy-provider";
 import { whatsappUrl } from "@/lib/contact";
 import { validateReferenceImages } from "@/lib/reference-images";
 
 type SelectedImage = { file: File; preview: string };
 export function RequestForm({ custom = false }: { custom?: boolean }) {
   const params = useSearchParams();
+  const { categories } = useTaxonomy();
   const formRef = useRef<HTMLFormElement>(null);
   const previews = useRef(new Set<string>());
   const uploaded = useRef<{ files: File[]; urls: string[]; requestId: string } | null>(null);

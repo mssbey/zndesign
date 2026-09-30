@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
-import { site, collections } from "@/lib/data";
+import { site } from "@/lib/data";
+import { getCollections } from "@/lib/taxonomy";
 import { getProducts } from "@/lib/db";
 export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!site.domain) return [];
-  const products = await getProducts();
+  const [products, collections] = await Promise.all([getProducts(), getCollections()]);
   return [
     "",
     "/urunler",

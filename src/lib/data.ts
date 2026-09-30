@@ -10,7 +10,10 @@ export const site = {
   factoryAddress: process.env.NEXT_PUBLIC_FACTORY_ADDRESS || "",
 };
 export const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
-export const categories = [
+export type Category = { slug: string; name: string; description: string; image: string };
+export type Collection = Category & { subtitle: string };
+// Seed values only: the live lists are stored in the database (see lib/taxonomy.ts) and edited from /admin/taxonomy.
+export const defaultCategories: Category[] = [
   {
     slug: "bazalar",
     name: "Baza",
@@ -44,14 +47,13 @@ export const categories = [
   { slug: "sehpa", name: "Sehpa", image: "/images/modern.webp", description: "Mekânınıza uyum sağlayan sade ve işlevsel tasarımlar." },
   { slug: "diger-urunler", name: "Diğer Ürünler", image: "/images/bedding.webp", description: "Yaşam alanınız için tamamlayıcı parçalar ve özel çözümler." },
 ];
-export const collections = [
+export const defaultCollections: Collection[] = [
   {
     slug: "bohem-koleksiyon",
     name: "Bohem Koleksiyon",
     subtitle: "Az detay. Çok his.",
     description: "Doğal tonlar, yalın çizgiler ve dingin bir yaşam alanı.",
     image: "/images/hero.webp",
-    demo: true,
   },
   {
     slug: "modern-koleksiyon",
@@ -59,7 +61,6 @@ export const collections = [
     subtitle: "Mekânınıza yeni bir karakter.",
     description: "Belirgin çizgiler ve dokulu yüzeylerle modern bir yorum.",
     image: "/images/modern.webp",
-    demo: true,
   },
   {
     slug: "kids-collection",
@@ -67,16 +68,15 @@ export const collections = [
     subtitle: "Küçük hayallere büyük bir yer.",
     description: "Çocuk odaları için yumuşak tonlarla şekillenen bir dünya.",
     image: "/images/kids.webp",
-    demo: true,
   },
-  { slug: "luxury-koleksiyon", name: "Luxury Koleksiyon", subtitle: "Zarafetin incelikli yorumu.", description: "Zengin dokular ve özenli detaylarla şekillenen yaşam alanları.", image: "/images/headboard.webp", demo: true },
-  { slug: "rustic-koleksiyon", name: "Rustic Koleksiyon", subtitle: "Doğallığın sıcaklığı.", description: "Toprak tonları, doğal görünümler ve zamansız bir sadelik.", image: "/images/hero.webp", demo: true },
-  { slug: "yeni-koleksiyonlar", name: "Yeni Koleksiyonlar", subtitle: "Yeni tasarımlarla tanışın.", description: "Yaşam alanınıza yeni bir bakış getiren son modellerimiz.", image: "/images/modern.webp", demo: true },
+  { slug: "luxury-koleksiyon", name: "Luxury Koleksiyon", subtitle: "Zarafetin incelikli yorumu.", description: "Zengin dokular ve özenli detaylarla şekillenen yaşam alanları.", image: "/images/headboard.webp" },
+  { slug: "rustic-koleksiyon", name: "Rustic Koleksiyon", subtitle: "Doğallığın sıcaklığı.", description: "Toprak tonları, doğal görünümler ve zamansız bir sadelik.", image: "/images/hero.webp" },
+  { slug: "yeni-koleksiyonlar", name: "Yeni Koleksiyonlar", subtitle: "Yeni tasarımlarla tanışın.", description: "Yaşam alanınıza yeni bir bakış getiren son modellerimiz.", image: "/images/modern.webp" },
 ].sort((a, b) => ["modern-koleksiyon", "luxury-koleksiyon", "bohem-koleksiyon", "rustic-koleksiyon", "kids-collection", "yeni-koleksiyonlar"].indexOf(a.slug) - ["modern-koleksiyon", "luxury-koleksiyon", "bohem-koleksiyon", "rustic-koleksiyon", "kids-collection", "yeni-koleksiyonlar"].indexOf(b.slug));
 export const categoryAliases: Record<string, string> = { "baza-baslik-setleri": "bazalar", "uyku-setleri": "diger-urunler", kids: "diger-urunler" };
 export const collectionAliases: Record<string, string> = { "sade-yasam": "bohem-koleksiyon", "modern-konfor": "modern-koleksiyon", "kids-dunyasi": "kids-collection" };
 export type { Product } from "./db";
-export const categoryName = (slug: string) =>
+export const categoryName = (categories: Category[], slug: string) =>
   categories.find((c) => c.slug === slug)?.name || slug;
 export const colorHex: Record<string, string> = {
   Krem: "#e7dfd1",

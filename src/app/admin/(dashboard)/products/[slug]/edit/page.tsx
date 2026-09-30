@@ -3,6 +3,7 @@ import { AdminNav } from "@/components/admin-nav";
 import { ProductForm } from "@/components/product-form";
 import { getProductBySlug } from "@/lib/db";
 import { updateProductAction } from "@/app/admin/actions";
+import { getCategories, getCollections } from "@/lib/taxonomy";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 export default async function EditProductPage({
@@ -11,14 +12,14 @@ export default async function EditProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, categories, collections] = await Promise.all([getProductBySlug(slug), getCategories(), getCollections()]);
   if (!product) notFound();
   const action = updateProductAction.bind(null, slug);
   return (
     <>
       <AdminNav />
       <h1 className="mb-6 text-xl font-semibold">{product.name} — Düzenle</h1>
-      <ProductForm action={action} product={product} />
+      <ProductForm action={action} product={product} categories={categories} collections={collections} />
     </>
   );
 }

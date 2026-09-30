@@ -1,10 +1,12 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Product, categoryName, colorHex } from "@/lib/data";
+import { Product, colorHex } from "@/lib/data";
+import { useTaxonomy } from "./taxonomy-provider";
 import { productMessage, whatsappUrl } from "@/lib/contact";
 import { Photo, Arrow } from "./shared";
 export function ProductDetail({ product: p }: { product: Product }) {
+  const { categoryName } = useTaxonomy();
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   const [fabric, setFabric] = useState("");

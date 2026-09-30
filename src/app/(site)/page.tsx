@@ -2,7 +2,8 @@ import Link from "next/link";
 import { SiteIcon, categoryIcons, type IconName } from "@/components/site-icon";
 import { Photo } from "@/components/shared";
 import { HomeSlider, FeaturedProducts, References } from "@/components/woodmart-home";
-import { categories, collections, site } from "@/lib/data";
+import { site } from "@/lib/data";
+import { getCategories, getCollections } from "@/lib/taxonomy";
 import { CategoryCards } from "@/components/category-cards";
 import { FactoryGallery } from "@/components/factory-gallery";
 import { whatsappUrl } from "@/lib/contact";
@@ -10,10 +11,10 @@ import { getProducts } from "@/lib/db";
 export const dynamic = "force-dynamic";
 export const metadata = { ...(site.domain ? { alternates: { canonical: site.domain.replace(/\/$/, "") } } : {}) };
 export default async function Home() {
-  const products = await getProducts();
+  const [products, categories, collections] = await Promise.all([getProducts(), getCategories(), getCollections()]);
   return <>
     <section className="wd-hero-area"><div className="wrap wd-hero-layout"><aside className="wd-sidebar" aria-label="Ürün kategorileri">
-      {categories.map(c => <Link key={c.slug} href={`/urunler?kategori=${c.slug}`}><span className="wd-category-icon"><SiteIcon name={categoryIcons[c.slug]} /></span>{c.name}<SiteIcon name="chevron" className="wd-chevron" width={14} height={14} /></Link>)}
+      {categories.map(c => <Link key={c.slug} href={`/urunler?kategori=${c.slug}`}><span className="wd-category-icon"><SiteIcon name={categoryIcons[c.slug] ?? "grid"} /></span>{c.name}<SiteIcon name="chevron" className="wd-chevron" width={14} height={14} /></Link>)}
       {[ ["/koleksiyonlar", "layers", "Koleksiyonlar"], ["/ozel-uretim", "ruler", "Özel Üretim"], ["/kumas-renk-kartelasi", "fabric", "Kumaş & Renk Kartelası"], ["/urunler?yeni=1", "sparkle", "Yeni Ürünler"], ["/urunler?kampanya=1", "tag", "Kampanyalar"] ].map(([href, icon, label]) => <Link href={href} key={href}><span className="wd-category-icon"><SiteIcon name={icon as IconName} /></span>{label}<SiteIcon name="chevron" className="wd-chevron" width={14} height={14} /></Link>)}
     </aside><HomeSlider/></div></section>
     <CategoryCards />

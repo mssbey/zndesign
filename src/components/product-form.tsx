@@ -1,18 +1,37 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Image from "next/image";
-import { categories, collections, type Product } from "@/lib/data";
+import type { Category, Collection, Product } from "@/lib/data";
 import type { FormState } from "@/app/admin/actions";
 const initialState: FormState = {};
 export function ProductForm({
   action,
   product,
+  categories,
+  collections,
 }: {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   product?: Product;
+  categories: Category[];
+  collections: Collection[];
 }) {
   const [state, formAction, pending] = useActionState(action, initialState);
-  const galleryExtra = product?.gallery.slice(1) || [];
+  const [cover, setCover] = useState(product?.image || "");
+  const [galleryExtra, setGalleryExtra] = useState(
+    () => product?.gallery.filter((src) => src !== product.image) || [],
+  );
+  function moveImage(index: number, direction: -1 | 1) {
+    const next = [...galleryExtra];
+    [next[index], next[index + direction]] = [next[index + direction], next[index]];
+    setGalleryExtra(next);
+  }
+  function makeCover(index: number) {
+    // The previous cover takes the chosen image's place in the gallery.
+    const next = [...galleryExtra];
+    next[index] = cover;
+    setCover(galleryExtra[index]);
+    setGalleryExtra(next);
+  }
   return (
     <form action={formAction} className="flex max-w-2xl flex-col gap-5">
       <label className="flex flex-col gap-1 text-sm">
@@ -153,52 +172,66 @@ export function ProductForm({
             Mevcut:
             <span className="relative inline-block h-10 w-10 overflow-hidden rounded">
               <Image
-                src={product.image}
+                src={cover}
                 alt=""
                 fill
                 sizes="40px"
                 className="object-cover"
               />
             </span>
-            Değiştirmek istemiyorsanız boş bırakın.
+            Değiştirmek istemiyorsanız boş bırakın. Galerideki bir görseli
+            aşağıdan kapak yapabilirsiniz.
           </span>
         )}
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        Ek galeri görselleri (opsiyonel, birden fazla seçilebilir)
-        <input
-          type="file"
-          name="gallery"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          multiple
-          className="rounded border border-[var(--line)] px-3 py-2"
-        />
-        {product && galleryExtra.length > 0 && (
-          <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
-            Mevcut galeri:
-            {galleryExtra.map((src) => (
-              <span
+      <fieldset className="flex flex-col gap-2 text-sm">
+        <legend className="mb-1">Ek galeri görselleri</legend>
+        {galleryExtra.length > 0 ? (
+          <ul className="flex flex-wrap gap-3">
+            {galleryExtra.map((src, i) => (
+              <li
                 key={src}
-                className="relative inline-block h-10 w-10 overflow-hidden rounded"
+                className="flex w-28 flex-col gap-1 rounded border border-[var(--line)] p-1.5"
               >
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="40px"
-                  className="object-cover"
-                />
-              </span>
+                <span className="relative block aspect-square w-full overflow-hidden rounded">
+                  <Image src={src} alt={`Galeri görseli ${i + 1}`} fill sizes="112px" className="object-cover" />
+                </span>
+                <span className="flex justify-between">
+                  <button type="button" onClick={() => moveImage(i, -1)} disabled={i === 0} aria-label={`Görsel ${i + 1} sola taşı`} className="rounded border border-[var(--line)] px-2 disabled:opacity-30">←</button>
+                  <button type="button" onClick={() => moveImage(i, 1)} disabled={i === galleryExtra.length - 1} aria-label={`Görsel ${i + 1} sağa taşı`} className="rounded border border-[var(--line)] px-2 disabled:opacity-30">→</button>
+                  <button type="button" onClick={() => setGalleryExtra(galleryExtra.filter((x) => x !== src))} aria-label={`Görsel ${i + 1} kaldır`} className="rounded border border-[var(--line)] px-2 text-red-600">×</button>
+                </span>
+                <button type="button" onClick={() => makeCover(i)} className="text-xs underline">Kapak yap</button>
+              </li>
             ))}
-            Yeni görsel seçerseniz bunların yerine geçer.
+          </ul>
+        ) : (
+          product && <span className="text-xs text-[var(--muted)]">Galeride kapak dışında görsel yok.</span>
+        )}
+        <label className="flex flex-col gap-1">
+          <span className="text-xs text-[var(--muted)]">
+            Yeni görsel ekle (birden fazla seçilebilir; mevcut görsellerin sonuna eklenir)
+          </span>
+          <input
+            type="file"
+            name="gallery"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="rounded border border-[var(--line)] px-3 py-2"
+          />
+        </label>
+        {product && (
+          <span className="text-xs text-[var(--muted)]">
+            Sıralama, kaldırma ve kapak değişiklikleri &quot;Değişiklikleri Kaydet&quot; ile uygulanır.
           </span>
         )}
-      </label>
+      </fieldset>
       <input
         type="hidden"
         name="existingGalleryExtra"
-        value={galleryExtra.join(",")}
+        value={JSON.stringify(galleryExtra)}
       />
+      <input type="hidden" name="existingCover" value={cover} />
       {state.error && (
         <p className="text-sm text-red-600" role="alert">
           {state.error}
@@ -207,7 +240,7 @@ export function ProductForm({
       <button
         type="submit"
         disabled={pending}
-        className="w-fit rounded bg-[var(--ink)] px-5 py-2 text-sm text-white disabled:opacity-60"
+        className="w-fit rounded bg-[var(--ink)] px-5 py-2 text-sm text-white! disabled:opacity-60"
       >
         {pending ? "Kaydediliyor…" : product ? "Değişiklikleri Kaydet" : "Ürünü Ekle"}
       </button>
