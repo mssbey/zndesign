@@ -9,6 +9,7 @@ import { FactoryGallery } from "@/components/factory-gallery";
 import { CompanyGallery } from "@/components/company-gallery";
 import { getGallery } from "@/lib/gallery";
 import { whatsappUrl } from "@/lib/contact";
+import { getContents, getFabricGroups } from "@/lib/content";
 import { getProducts, getProductBySlug } from "@/lib/db";
 import {
   Photo,
@@ -16,6 +17,7 @@ import {
   SectionHead,
   Arrow,
   StoreInvite,
+  Lines,
 } from "@/components/shared";
 import { Catalog } from "@/components/catalog";
 import { ProductDetail } from "@/components/product-detail";
@@ -170,63 +172,44 @@ export default async function Page({
     );
   }
   if (id || !pages[page]) notFound();
-  if (page === "kumas-renk-kartelasi") return <FabricCatalog/>;
+  if (page === "kumas-renk-kartelasi") {
+    const [groups, content] = await Promise.all([getFabricGroups(), getContents(["fabrics-intro"])]);
+    return <FabricCatalog groups={groups} content={content["fabrics-intro"]}/>;
+  }
   if (page === "fabrikamiz") return <>
     <div className="wrap page-intro"><p className="eyebrow">DOĞRUDAN ÜRETİCİNİZLE TANIŞIN</p><h1>Üretimi yerinde görün,<br/><em>birlikte tasarlayalım.</em></h1><p>Ürünlerimizi kendi tesisimizde üretiyoruz. Sizi, üretimimizi tanımaya ve yaşam alanınızın detaylarını birlikte seçmeye davet ediyoruz.</p></div>
     <FactoryGallery/>
     <section className="wrap zenn-factory-details"><div><p className="eyebrow">ZİYARETİNİZDE</p><h2>Dokunun. İnceleyin.<br/><em>Birlikte karar verelim.</em></h2><ol className="zenn-visit-steps"><li><b>Üretimimizi tanıyın</b><p>Ürünlerin hazırlanışını ve işçilik detaylarını yerinde görün.</p></li><li><b>Kumaşları karşılaştırın</b><p>Gerçek kartelaları, dokuları ve renkleri birlikte inceleyelim.</p></li><li><b>Tasarımınızı netleştirin</b><p>Ölçü, model, üretim süresi ve teslimat detaylarını konuşalım.</p></li></ol></div><div className="address-card"><p className="eyebrow">FABRİKA ZİYARETİ</p><h2>Sizi bekliyoruz.</h2><p>Ziyaret öncesinde bizimle iletişime geçerek uygun zamanı ve tesis konumunu öğrenebilirsiniz.</p>{site.factoryAddress && <p>{site.factoryAddress}</p>}<a className="button" href={whatsappUrl("Merhaba, Zenn Bedding üretim tesisini ziyaret etmek istiyorum. Konum ve ziyaret için uygun zaman hakkında bilgi alabilir miyim?")}>Ziyaret İçin İletişime Geçin ↗</a>{site.factoryAddress && <a className="text-link" target="_blank" rel="noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.factoryAddress)}`}>Fabrika Yol Tarifi ↗</a>}<p className="form-note">Mağazamız: {site.address}</p><Link href="/magazamiz" className="text-link">Mağaza Yol Tarifi <Arrow /></Link></div></section>
   </>;
-  if (page === "ozel-uretim")
+  if (page === "ozel-uretim") {
+    const { "custom-hero": hero, "custom-steps": steps } = await getContents(["custom-hero", "custom-steps"]);
     return (
       <>
         <section className="wrap editorial-hero">
           <div>
-            <p className="eyebrow">ÖZEL ÖLÇÜ & ÖZEL ÜRETİM</p>
+            <p className="eyebrow">{hero.eyebrow}</p>
             <h1>
-              Size özel ölçüler.
-              <br />
-              <em>Size ait bir tarz.</em>
+              {hero.title}
+              {hero.titleEm && <><br /><em>{hero.titleEm}</em></>}
             </h1>
-            <p>
-              Ölçü, renk ve kumaş seçenekleri hakkında bizimle görüşerek yaşam
-              alanınıza uygun alternatifleri keşfedin.
-            </p>
-            <a className="text-link" href="#talep">
-              Hayalinizi paylaşın <Arrow />
-            </a>
+            <p><Lines text={hero.text} /></p>
+            {hero.linkText && <a className="text-link" href="#talep">
+              {hero.linkText} <Arrow />
+            </a>}
           </div>
-          <Photo
-            src="/images/fabric.webp"
-            alt="Keten, bukle ve kadife kumaş seçenekleri"
-            priority
-          />
+          <Photo src={hero.image} alt={hero.imageAlt} priority />
         </section>
         <section className="wrap form-layout" id="talep">
           <div>
-            <p className="eyebrow">DETAYLARDA SİZ VARSINIZ</p>
-            <h2>
-              Her tercih,
+            <p className="eyebrow">{steps.eyebrow}</p>
+            <h2><Lines text={steps.title} /></h2>
+            {[1, 2, 3].map(n => (steps[`step${n}Title`] || steps[`step${n}Text`]) && <p key={n}>
+              <b>{steps[`step${n}Title`]}</b>
               <br />
-              yeni bir ihtimal.
-            </h2>
-            <p>
-              <b>01 / Ölçü</b>
-              <br />
-              Odanızın ve ilgilendiğiniz ürünün ölçülerini paylaşın; uygun
-              alternatifleri değerlendirelim.
-            </p>
-            <p>
-              <b>02 / Doku & renk</b>
-              <br />
-              Sekiz kumaş grubunu ve renk örneklerini keşfedin; gerçek kartelaları ziyaretinizde yakından inceleyin. <Link className="text-link" href="/kumas-renk-kartelasi">Kumaş & Renk Kartelası <Arrow /></Link>
-            </p>
-            <p>
-              <b>03 / Son dokunuş</b>
-              <br />
-              Üretim uygunluğu, süre ve teslimat detayları görüşme sırasında
-              netleştirilir.
-            </p>
-            <Photo src="/images/headboard.webp" alt="Döşemeli başlık detayı" />
+              <Lines text={steps[`step${n}Text`]} />
+              {n === 2 && steps.step2LinkText && <> <Link className="text-link" href="/kumas-renk-kartelasi">{steps.step2LinkText} <Arrow /></Link></>}
+            </p>)}
+            <Photo src={steps.image} alt={steps.imageAlt} />
           </div>
           <Suspense>
             <RequestForm custom />
@@ -234,6 +217,7 @@ export default async function Page({
         </section>
       </>
     );
+  }
   if (page === "biz-kimiz")
     return (
       <>

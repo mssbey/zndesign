@@ -55,29 +55,100 @@
 .woodmart-site .zn-cats-heading > p:last-child, .zn-cat-copy > span { color: var(--muted); }
 .zn-cat-copy strong { color: var(--ink); }
 .zn-cat:hover .zn-cat-copy strong { color: var(--accent); }
-.company-gallery { padding-block: 60px; background: var(--cream); border-block: 1px solid var(--line); }
+.company-gallery { padding-block: 90px; background: var(--cream); border-block: 1px solid var(--line); }
 .company-gallery .wd-section-heading { max-width: 740px; margin-inline: auto; }
-.company-gallery-filters { display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; }
-.company-gallery-filters button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; padding: 12px 24px; border: 1px solid #b7a38b; background: transparent; color: #604730; font: inherit; font-weight: 700; }
-.company-gallery-filters button[aria-pressed=true] { color: #fff; background: #604730; border-color: #604730; }
-.company-gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-.company-gallery-grid figure { margin: 0; min-width: 0; background: var(--light); border: 1px solid var(--line); }
-.company-gallery-grid .photo { aspect-ratio: 4/3; }
-.company-gallery-grid figcaption { padding: 17px 20px; line-height: 1.6; overflow-wrap: anywhere; }
-.company-gallery-empty { padding: 50px 20px; background: #fffdf9; border: 1px solid var(--line); text-align: center; }
+.company-gallery-filters { display: flex; width: fit-content; margin: 0 auto 44px; padding: 5px; gap: 4px; border: 1px solid #d8cdbd; background: #fffdf9; }
+.company-gallery-filters button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 10px 26px; border: 0; background: transparent; color: #604730; font: inherit; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: background .25s, color .25s; }
+.company-gallery-filters button:hover { background: #f1e8dc; }
+.company-gallery-filters button[aria-pressed=true] { color: #f5f0e8; background: #302a25; }
+.company-gallery-filters svg { width: 18px; height: 18px; }
+.company-gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 260px; gap: 16px; margin-inline: auto; }
+.company-gallery-grid[data-count="1"] { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; max-width: 880px; }
+.company-gallery-grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 380px; }
+.company-gallery-grid[data-count="3"] > figure:first-child { grid-column: span 2; grid-row: span 2; }
+.company-gallery-grid figure { position: relative; margin: 0; min-width: 0; overflow: hidden; background: #ddd5c8; box-shadow: 0 24px 50px -36px rgba(48, 42, 37, .6); }
+.company-gallery-grid figure .photo { height: 100%; aspect-ratio: auto; }
+.company-gallery-grid[data-count="1"] figure .photo { aspect-ratio: 3 / 2; height: auto; }
+.company-gallery-grid figure .photo img { transition: transform 1.2s ease; }
+.company-gallery-grid figure:hover .photo img { transform: scale(1.04); }
+.company-gallery-grid figcaption { position: absolute; inset: auto 0 0; display: flex; align-items: baseline; gap: 14px; padding: 60px 24px 20px; background: linear-gradient(transparent, rgba(30, 25, 21, .78)); color: #f5f0e8; font-size: 14px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.company-gallery-grid figcaption > span { color: #c9b497; font-size: 11px; font-weight: 700; letter-spacing: .14em; }
+.company-gallery-empty { max-width: 640px; margin-inline: auto; padding: 56px 24px; background: #fffdf9; border: 1px solid var(--line); text-align: center; }
 .company-gallery-empty > svg { margin: 0 auto 20px; color: var(--accent); }
 .company-gallery-empty p { margin-top: 8px; }
 .factory-gallery figcaption { overflow-wrap: anywhere; }
 @media (max-width: 800px) {
-  .company-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .company-gallery { padding-block: 60px; }
+  .company-gallery-grid, .company-gallery-grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 220px; }
 }
 @media (max-width: 540px) {
-  .company-gallery { padding-block: 40px; }
+  .company-gallery { padding-block: 45px; }
   .company-gallery .wd-section-heading h2 { font-size: 23px; }
-  .company-gallery-filters { gap: 8px; }
-  .company-gallery-filters button { padding: 10px 12px; gap: 7px; font-size: 13px; }
-  .company-gallery-grid { grid-template-columns: 1fr; }
+  .company-gallery-filters { margin-bottom: 28px; }
+  .company-gallery-filters button { padding: 10px 14px; gap: 7px; font-size: 11px; letter-spacing: .08em; }
+  .company-gallery-grid, .company-gallery-grid[data-count="2"] { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; gap: 12px; }
+  .company-gallery-grid[data-count="3"] > figure:first-child { grid-column: auto; grid-row: auto; }
+  .company-gallery-grid figure .photo { aspect-ratio: 4 / 3; height: auto; }
+  .company-gallery-grid figcaption { padding: 44px 16px 14px; font-size: 13px; }
 }
+@media (prefers-reduced-motion: reduce) { .company-gallery-grid figure .photo img, .company-gallery-filters button { transition: none; } }
 @media (prefers-reduced-motion: reduce) {
   .woodmart-site .zn-cat, .zn-cat-chevron { transition: none; }
+}
+
+/* Slide copy is stacked above the image; keep the dots tappable when the copy is long. */
+.wd-slider-dots{z-index:3}
+
+/* Home factory invitation: framed photo beside the copy */
+.wd-factory-split { margin-top: 55px; padding-block: 90px; background: #eee9df; border-block: 1px solid var(--line); overflow: hidden; }
+.wd-factory-split > .wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 80px; align-items: center; }
+.wd-factory-split.no-media > .wrap { grid-template-columns: minmax(0, 760px); justify-content: center; text-align: center; }
+.wd-factory-media { position: relative; padding: 0 22px 22px 0; }
+.wd-factory-media::before { content: ""; position: absolute; inset: 22px 0 0 22px; border: 1px solid #b7a38b; pointer-events: none; }
+.wd-factory-media figure { position: relative; margin: 0; overflow: hidden; box-shadow: 0 30px 60px -35px rgba(48, 42, 37, .55); }
+.wd-factory-media figure .photo { aspect-ratio: 5 / 4; background: #ddd5c8; }
+.wd-factory-media figure .photo img { transition: transform 1.2s ease; }
+.wd-factory-media figure:hover .photo img { transform: scale(1.03); }
+.wd-factory-badge { position: absolute; left: 0; bottom: 30px; display: flex; align-items: center; gap: 12px; padding: 14px 22px; background: #302a25; color: #f5f0e8; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.wd-factory-badge svg { color: #c9b497; flex: none; }
+.wd-factory-thumbs { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.wd-factory-thumbs .photo { aspect-ratio: 4 / 3; }
+.wd-factory-copy .wd-factory-eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .16em; }
+.wd-factory-copy .wd-factory-eyebrow::before { content: ""; width: 38px; height: 1px; background: currentColor; flex: none; }
+.woodmart-site .wd-factory-copy h2 { margin: 0 0 22px; font-size: clamp(28px, 2.6vw, 40px); line-height: 1.22; letter-spacing: -.5px; text-wrap: balance; }
+.wd-factory-copy > p:not(.wd-factory-eyebrow) { margin: 0; color: #5f5850; font-size: 15px; line-height: 1.85; }
+.wd-factory-copy ul { list-style: none; margin: 30px 0 0; padding: 0; border-top: 1px solid #d8cdbd; }
+.wd-factory-copy li { display: flex; align-items: baseline; gap: 18px; padding: 15px 0; border-bottom: 1px solid #d8cdbd; color: #302a25; font-size: 15px; }
+.wd-factory-copy li > span { min-width: 22px; color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .1em; }
+.wd-factory-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.wd-factory-actions .button { margin: 0; }
+.no-media .wd-factory-eyebrow, .no-media .wd-factory-copy li, .no-media .wd-factory-actions { justify-content: center; }
+@media (max-width: 900px) {
+  .wd-factory-split { padding-block: 60px; }
+  .wd-factory-split > .wrap { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+}
+@media (max-width: 540px) {
+  .wd-factory-split { margin-top: 35px; padding-block: 45px; }
+  .wd-factory-split > .wrap { gap: 36px; }
+  .wd-factory-media { padding: 0 12px 12px 0; }
+  .wd-factory-media::before { inset: 12px 0 0 12px; }
+  .wd-factory-badge { bottom: 16px; padding: 10px 14px; font-size: 10px; }
+  .wd-factory-thumbs { gap: 8px; margin-top: 8px; }
+  .woodmart-site .wd-factory-copy h2 { font-size: 25px; }
+  .wd-factory-copy > p:not(.wd-factory-eyebrow), .wd-factory-copy li { font-size: 14px; }
+  .wd-factory-actions { flex-direction: column; }
+  .wd-factory-actions .button { width: 100%; justify-content: center; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { .wd-factory-media figure .photo img { transition: none; } }
+
+/* Developer credit under the footer; the mark sits in the left corner, clear of the floating contact button. */
+.footer-credit { position: relative; display: flex; justify-content: center; align-items: center; padding-block: 14px; border-top: 1px solid var(--line); color: #8a8178; font-size: 11px; letter-spacing: .02em; text-align: center; }
+.footer-mark { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 72px; overflow: hidden; color: #604730; font-size: 9px; font-weight: 700; letter-spacing: .25em; line-height: 1.6; }
+.footer-mark > span { display: inline-block; white-space: nowrap; animation: footer-mark-slide 6s linear infinite; }
+@keyframes footer-mark-slide { from { transform: translateX(72px); } to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { .footer-mark > span { animation: none; } }
+@media (max-width: 540px) {
+  .woodmart-site .footer-bottom { padding-bottom: 20px; }
+  .woodmart-site .footer-credit { align-items: flex-start; padding-bottom: 100px; font-size: 10px; }
+  .footer-mark { top: 16px; transform: none; }
 }

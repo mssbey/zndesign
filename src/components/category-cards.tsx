@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { site } from "@/lib/data";
 
 const icon = { width: 64, height: 64, viewBox: "0 0 64 64", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
 
@@ -25,10 +24,10 @@ const cards = [
 
 const Chevron = () => <svg className="zn-cat-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>;
 
-export function CategoryCards() {
+export function CategoryCards({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
   return <section className="zn-cats" id="kategoriler">
     <div className="wrap">
-      <div className="zn-cats-heading"><p>{site.name.toUpperCase()} KOLEKSİYONLARI</p><h2>Öne Çıkan Kategoriler</h2><p>Yaşam alanınız için tasarlanan konforlu ve zamansız seçenekler.</p></div>
+      <div className="zn-cats-heading"><p>{eyebrow}</p><h2>{title}</h2>{text && <p>{text}</p>}</div>
       <div className="zn-cats-grid">
         {cards.map(c => <Link key={c.title} href={c.href} className={c.wide ? "zn-cat wide" : "zn-cat"}>
           <span className="zn-cat-icon">{c.icon}</span>

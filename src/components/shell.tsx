@@ -14,7 +14,7 @@ function MenuChevron() {
   return <svg className="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" /></svg>;
 }
 
-export function Header() {
+export function Header({ announcement }: { announcement: string }) {
   const { categories, collections } = useTaxonomy();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function Header() {
       else { setOpen(false); toggle.current?.focus(); }
     }
   }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) close(); }}>
-    <div className="wd-topbar"><div className="wrap"><span>TÜRKÇE <MenuChevron /> <b> TÜRKİYE</b></span><span>YAŞAM ALANINIZA TASARIM, UYKUNUZA KONFOR</span><div><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim">İLETİŞİM</Link><Link href="/biz-kimiz">BİZ KİMİZ</Link></div></div></div>
+    <div className="wd-topbar"><div className="wrap"><span>TÜRKÇE <MenuChevron /> <b> TÜRKİYE</b></span><span>{announcement}</span><div><Link href="/magazamiz">MAĞAZAMIZ</Link><Link href="/iletisim">İLETİŞİM</Link><Link href="/biz-kimiz">BİZ KİMİZ</Link></div></div></div>
     <div className="wrap wd-main-header">
       <button ref={toggle} className="menu-toggle" aria-label={open ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={open} aria-controls="navigation" onClick={() => { setOpen(!open); setExpanded(null); }}><SiteIcon name={open ? "close" : "menu"} width={24} height={24} /></button>
       <Link href="/" aria-label="Zenn Bedding ana sayfa" onClick={close}><Brand /></Link>
@@ -114,6 +114,10 @@ export function Footer() {
           © {new Date().getFullYear()} Zenn Bedding. Tüm hakları saklıdır.
         </span>
         <span>Ürün ve koleksiyonlar örnektir. Görseller temsilidir.</span>
+      </div>
+      <div className="wrap footer-credit">
+        <span>Zeynart Web Bilişim tarafından yapılmıştır.</span>
+        <span className="footer-mark" aria-hidden="true"><span>MSS</span></span>
       </div>
     </footer>
   );

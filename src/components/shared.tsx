@@ -1,4 +1,5 @@
 "use client";
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product, colorHex, site } from "@/lib/data";
@@ -112,4 +113,9 @@ export function StoreInvite() {
       </div>
     </section>
   );
+}
+
+/** Renders admin-entered text, turning line breaks into <br/>. */
+export function Lines({ text }: { text: string }) {
+  return <>{text.split("\n").map((line, i) => <Fragment key={i}>{i > 0 && <br />}{line}</Fragment>)}</>;
 }
