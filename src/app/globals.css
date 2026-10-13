@@ -809,29 +809,50 @@ input[type="checkbox"] {
 .lightbox {
   position: fixed;
   inset: 0;
-  margin: auto;
+  margin: 0;
   border: 0;
-  padding: 20px;
-  background: var(--light);
-  width: min(1000px, 94vw);
-  max-height: 94dvh;
+  padding: 16px;
+  background: #161616;
+  color: #fff;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+.lightbox[open] {
+  display: flex;
+  flex-direction: column;
 }
 .lightbox::backdrop {
-  background: #161616de;
+  background: #161616;
 }
+.lightbox-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+}
+/* Show the whole photo as large as the screen allows instead of a cropped box. */
 .lightbox .photo {
-  max-height: 75dvh;
-  aspect-ratio: 1.5;
+  flex: 1;
+  width: 100%;
+  aspect-ratio: auto;
+  background: transparent;
+}
+.lightbox .photo img {
+  object-fit: contain;
 }
 .lightbox-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 .lightbox button {
   background: transparent;
-  border: 1px solid var(--line);
+  color: inherit;
+  border: 1px solid #ffffff55;
   padding: 8px 15px;
 }
 .editorial-hero {
@@ -1440,10 +1461,10 @@ input[type="checkbox"] {
     padding: 30px;
   }
   .lightbox {
-    padding: 12px;
+    padding: 10px 0;
   }
-  .lightbox .photo {
-    aspect-ratio: 1;
+  .lightbox-controls {
+    padding: 0 10px;
   }
   .lightbox button {
     font-size: 10px;

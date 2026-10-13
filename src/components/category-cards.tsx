@@ -13,11 +13,11 @@ const icons = {
 };
 
 const cards = [
-  { href: "/urunler?kategori=bazalar", icon: icons.set, title: "Baza & Başlık Setleri", text: "Tamamlayıcı ve uyumlu tasarımlar", wide: true },
+  { href: "/urunler?kategori=yatak-basliklari", icon: icons.set, title: "Baza & Başlık Setleri", text: "Tamamlayıcı ve uyumlu tasarımlar", wide: true },
   { href: "/urunler?kategori=yatak-basliklari", icon: icons.headboard, title: "Yatak Başlıkları", text: "Her tarza uygun başlık modelleri" },
   { href: "/urunler?kategori=yataklar", icon: icons.mattress, title: "Yataklar", text: "Konforlu ve destekleyici uyku deneyimi" },
   { href: "/urunler?kategori=bazalar", icon: icons.storage, title: "Bazalar", text: "Fonksiyonel ve dayanıklı çözümler" },
-  { href: "/urunler?kategori=diger-urunler", icon: icons.bedding, title: "Uyku Setleri", text: "Eksiksiz bir uyku deneyimi" },
+  { href: "/urunler?kategori=diger-urunler", icon: icons.bedding, title: "Tamamlayıcılar", text: "Yaşam alanınızı tamamlayan parçalar" },
   { href: "/koleksiyonlar/kids-collection", icon: icons.kids, title: "KIDS / Çocuk Serisi", text: "Minikler için özel tasarımlar" },
   { href: "/ozel-uretim", icon: icons.custom, title: "Özel Üretim", text: "Alanınıza özel ölçü ve tasarım" },
 ];

@@ -18,7 +18,7 @@ export const defaultSlides = [
   { eyebrow: "Zenn Bedding KOLEKSİYONU", title: "Modern –", second: "Yaşam Alanları.", text: "Güçlü çizgiler ve özenle seçilmiş kumaşlarla yaşam alanınıza yeni bir karakter.", cta: "Koleksiyonu keşfet", image: "/images/modern.webp", href: "/koleksiyonlar/modern-koleksiyon", label: "Modern Koleksiyon" },
   { eyebrow: "Zenn Bedding KOLEKSİYONU", title: "Küçük Hayaller –", second: "Büyük Konfor.", text: "Çocuk odaları için sıcak detaylar, sakin renkler ve konforlu seçenekler.", cta: "Koleksiyonu keşfet", image: "/images/kids.webp", href: "/koleksiyonlar/kids-collection", label: "Kids Collection" },
   { eyebrow: "Zenn Bedding ÖZEL ÜRETİM", title: "Özel Üretim –", second: "Size Ait Bir Tarz.", text: "Ölçü, kumaş ve renk tercihlerinizi paylaşın; yaşam alanınıza özel tasarımı birlikte oluşturalım.", cta: "Özel üretimi keşfet", image: "/images/fabric.webp", href: "/ozel-uretim", label: "Özel Üretim" },
-  { eyebrow: "Zenn Bedding BAZA & BAŞLIK", title: "Baza & Başlık –", second: "Uyumlu Tasarımlar.", text: "Birbirini tamamlayan baza ve başlık setleriyle yatak odanızda dengeli bir bütün.", cta: "Setleri keşfet", image: "/images/base.webp", href: "/urunler?kategori=bazalar", label: "Baza & Başlık Setleri" },
+  { eyebrow: "Zenn Bedding BAZA & BAŞLIK", title: "Baza & Başlık –", second: "Uyumlu Tasarımlar.", text: "Birbirini tamamlayan baza ve başlık setleriyle yatak odanızda dengeli bir bütün.", cta: "Setleri keşfet", image: "/images/base.webp", href: "/urunler?kategori=yatak-basliklari", label: "Baza & Başlık Setleri" },
 ];
 export type Slide = (typeof defaultSlides)[number];
 

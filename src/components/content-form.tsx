@@ -1,11 +1,11 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, type ReactNode } from "react";
 import Image from "next/image";
 import type { ContentSection, ContentValues } from "@/lib/content-sections";
 import { saveContentAction, resetContentAction, type ContentState } from "@/app/admin/content-actions";
 import styles from "./gallery-admin.module.css";
 
-export function ContentForm({ section, values }: { section: ContentSection; values: ContentValues }) {
+export function ContentForm({ section, values, title = section.title, toolbar }: { section: ContentSection; values: ContentValues; title?: string; toolbar?: ReactNode }) {
   const [state, action, pending] = useActionState<ContentState, FormData>(async (previous, data) => {
     const next = await saveContentAction(section.id, previous, data);
     return { ...next, revision: next.revision ?? previous.revision };
@@ -14,10 +14,11 @@ export function ContentForm({ section, values }: { section: ContentSection; valu
   const isDefault = section.fields.every(field => values[field.key] === section.defaults[field.key]);
   const prefix = section.id;
   return <article className={`${styles.editor} rounded border border-[var(--line)] bg-white p-5`}>
+    {toolbar}
     {/* Remount after save or reset so inputs pick up the refreshed values. */}
     <form action={action} key={`${state.revision}-${reset.revision}`}>
       <fieldset disabled={pending || resetting} className="min-w-0 space-y-4 border-0 p-0">
-        <legend className="mb-1 text-lg font-semibold">{section.title}</legend>
+        <legend className="mb-1 text-lg font-semibold">{title}</legend>
         {section.hint && <p className="text-xs text-[var(--muted)]">{section.hint}</p>}
         {section.fields.map(field => {
           const id = `${prefix}-${field.key}`;
@@ -38,7 +39,7 @@ export function ContentForm({ section, values }: { section: ContentSection; valu
       {state.error && <p role="alert" className={`${styles.error} text-sm`}>{state.error}</p>}
       {state.success && <p role="status" className={`${styles.success} text-sm`}>{state.success}</p>}
     </form>
-    {!isDefault && <form action={resetAction} onSubmit={event => { if (!window.confirm(`"${section.title}" varsayılan içeriğe dönsün mü?`)) event.preventDefault(); }} className="mt-4 border-t border-[var(--line)] pt-4"><button disabled={pending || resetting} className={`${styles.remove} text-sm underline disabled:opacity-50`}>{resetting ? "Geri alınıyor…" : "Varsayılana dön"}</button>{reset.error && <p role="alert" className={`${styles.error} text-sm`}>{reset.error}</p>}</form>}
+    {!isDefault && <form action={resetAction} onSubmit={event => { if (!window.confirm(`"${title}" varsayılan içeriğe dönsün mü?`)) event.preventDefault(); }} className="mt-4 border-t border-[var(--line)] pt-4"><button disabled={pending || resetting} className={`${styles.remove} text-sm underline disabled:opacity-50`}>{resetting ? "Geri alınıyor…" : "Varsayılana dön"}</button>{reset.error && <p role="alert" className={`${styles.error} text-sm`}>{reset.error}</p>}</form>}
     {reset.success && isDefault && <p role="status" className={`${styles.success} text-sm`}>{reset.success}</p>}
   </article>;
 }

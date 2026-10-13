@@ -178,3 +178,56 @@ export function ScrollReveal() {
   }, [path]);
   return null;
 }
+/**
+ * Remembers the scroll position of each page and restores it on browser back/forward.
+ * Pages are server-rendered on every visit, so the browser's own restoration runs
+ * before the content is back and lands at the top; this retries until it fits.
+ */
+export function ScrollMemory() {
+  const path = usePathname();
+  const page = useRef("");
+  useEffect(() => { page.current = `scroll:${location.pathname}${location.search}`; }, [path]);
+  useEffect(() => {
+    const key = () => `scroll:${location.pathname}${location.search}`;
+    let restoring = 0;
+    let frame = 0;
+    const save = () => {
+      if (restoring) return;
+      page.current = key();
+      try { sessionStorage.setItem(key(), String(Math.round(scrollY))); } catch {}
+    };
+    const onScroll = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(save); };
+    const stop = () => { cancelAnimationFrame(restoring); restoring = 0; };
+    const restore = () => {
+      stop();
+      let target = 0;
+      try { target = Number(sessionStorage.getItem(key())) || 0; } catch {}
+      if (!target) return;
+      const start = performance.now();
+      const step = () => {
+        const reachable = document.documentElement.scrollHeight - innerHeight >= target;
+        if (reachable && Math.abs(scrollY - target) > 2) scrollTo({ top: target, behavior: "instant" });
+        // Keep enforcing briefly while the page re-renders and images settle.
+        restoring = performance.now() - start < 1500 ? requestAnimationFrame(step) : 0;
+      };
+      restoring = requestAnimationFrame(step);
+    };
+    history.scrollRestoration = "manual";
+    const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (navigation?.type === "back_forward") restore();
+    addEventListener("scroll", onScroll, { passive: true });
+    // Same-page (#anchor) history steps are left to the browser.
+    const onPop = () => { if (key() !== page.current) { page.current = key(); restore(); } };
+    addEventListener("popstate", onPop);
+    // Any user scroll gesture wins over the restore loop.
+    for (const type of ["wheel", "touchstart", "keydown"]) addEventListener(type, stop, { passive: true });
+    return () => {
+      stop();
+      cancelAnimationFrame(frame);
+      removeEventListener("scroll", onScroll);
+      removeEventListener("popstate", onPop);
+      for (const type of ["wheel", "touchstart", "keydown"]) removeEventListener(type, stop);
+    };
+  }, []);
+  return null;
+}

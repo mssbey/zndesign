@@ -6,6 +6,7 @@ import {
   Footer,
   FloatingContact,
   ScrollReveal,
+  ScrollMemory,
 } from "@/components/shell";
 import { TaxonomyProvider } from "@/components/taxonomy-provider";
 import { getCategories, getCollections } from "@/lib/taxonomy";
@@ -27,6 +28,7 @@ export default async function SiteLayout({
         <Footer />
         <FloatingContact />
         <ScrollReveal />
+        <ScrollMemory />
       </div>
     </TaxonomyProvider>
   );

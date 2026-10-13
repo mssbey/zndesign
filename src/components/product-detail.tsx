@@ -13,6 +13,7 @@ export function ProductDetail({ product: p }: { product: Product }) {
   const [index, setIndex] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
   const zoom = useRef<HTMLButtonElement>(null);
+  const swipe = useRef<number | null>(null);
   const gallery = p.gallery;
   function contact() {
     window.location.assign(
@@ -199,7 +200,18 @@ export function ProductDetail({ product: p }: { product: Product }) {
             Kapat ✕
           </button>
         </div>
-        <Photo src={gallery[index]} alt={`${p.name} büyütülmüş görsel`} />
+        <div
+          className="lightbox-stage"
+          onPointerDown={(e) => { swipe.current = e.clientX; }}
+          onPointerUp={(e) => {
+            const dx = e.clientX - (swipe.current ?? e.clientX);
+            swipe.current = null;
+            if (Math.abs(dx) > 40)
+              setIndex((index + (dx < 0 ? 1 : gallery.length - 1)) % gallery.length);
+          }}
+        >
+          <Photo src={gallery[index]} alt={`${p.name} büyütülmüş görsel`} />
+        </div>
       </dialog>
       <div className="mobile-product-bar">
         <strong>{p.name}</strong>

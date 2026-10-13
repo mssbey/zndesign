@@ -7,7 +7,7 @@ import { del } from "@vercel/blob";
 import { SESSION_COOKIE_NAME, isValidSessionToken } from "@/lib/auth";
 import { contentSections, pagePaths, type ContentPage, type ContentValues } from "@/lib/content-sections";
 import { deleteStoredValue, getContents, setStoredValue } from "@/lib/content";
-import { getSlides, resetSlideImage } from "@/lib/slides";
+import { getSlides, moveSlide, resetSlideImage } from "@/lib/slides";
 import { fabricTextures, FABRICS_KEY, type FabricGroup } from "@/lib/fabrics";
 import { saveUploadedImage } from "@/lib/upload";
 import { matchesImageSignature } from "@/lib/reference-images";
@@ -93,6 +93,13 @@ export async function resetContentAction(id: string): Promise<ContentState> {
   } catch { return { error: "Varsayılana dönülemedi. Lütfen tekrar deneyin." }; }
   refresh(section.page);
   return { success: "Varsayılan içeriğe dönüldü.", revision: randomUUID() };
+}
+
+export async function moveSlideAction(index: number, direction: -1 | 1) {
+  await requireAdmin();
+  if (!Number.isInteger(index) || (direction !== -1 && direction !== 1)) return;
+  await moveSlide(index, direction);
+  refresh("slider");
 }
 
 type FabricInput = { name?: unknown; note?: unknown; texture?: unknown; colors?: { uid?: unknown; name?: unknown; hex?: unknown; image?: unknown }[] }[];

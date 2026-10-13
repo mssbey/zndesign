@@ -7,13 +7,13 @@ import { getCategories, getCollections } from "@/lib/taxonomy";
 import { CategoryCards } from "@/components/category-cards";
 import { FactoryInvite } from "@/components/factory-gallery";
 import { getProducts } from "@/lib/db";
-import { defaultSlides, getSlides } from "@/lib/slides";
+import { defaultSlides, getOrderedSlides } from "@/lib/slides";
 import { getContents } from "@/lib/content";
 import { sectionsFor } from "@/lib/content-sections";
 export const dynamic = "force-dynamic";
 export const metadata = { ...(site.domain ? { alternates: { canonical: site.domain.replace(/\/$/, "") } } : {}) };
 export default async function Home() {
-  const [products, categories, collections, slides, content] = await Promise.all([getProducts(), getCategories(), getCollections(), getSlides().catch(() => defaultSlides), getContents(sectionsFor("home").map(s => s.id))]);
+  const [products, categories, collections, slides, content] = await Promise.all([getProducts(), getCategories(), getCollections(), getOrderedSlides().catch(() => defaultSlides), getContents(sectionsFor("home").map(s => s.id))]);
   const { "home-categories": cats, "home-featured": featured, "home-spotlight": spot, "home-about": about, "home-custom-banner": banner, "home-collections": coll, "home-factory": factory, "home-references": refs, "home-services": services } = content;
   const specs = [1, 2, 3].map(n => [spot[`spec${n}Label`], spot[`spec${n}Value`]]).filter(([label, value]) => label || value);
   return <>
